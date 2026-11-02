@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Version A — Single Orchestrator Pipeline | Sallie se Schoenen Returns Agent</title>
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --panel: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #d4d0c8;
+    --accent: #c0392b;
+    --accent2: #1a5276;
+    --accent3: #1e6f5c;
+    --warm: #d35400;
+    --gold: #b7950b;
+    --hitl: #8e44ad;
+    --node-fill: #f0ede8;
+    --node-stroke: #b8b0a0;
+    --decide-fill: #eaf2f8;
+    --decide-stroke: #2980b9;
+    --hitl-fill: #f5eef8;
+    --hitl-stroke: #7d3c98;
+    --parallel-fill: #e8f8f0;
+    --parallel-stroke: #1e6f5c;
+    --final-fill: #fef9e7;
+    --final-stroke: #b7950b;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--ink); padding: 32px 24px 64px; line-height: 1.55;
+  }
+  .page { max-width: 1200px; margin: 0 auto; }
+  header {
+    display: flex; align-items: flex-start; gap: 20px;
+    padding: 24px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; margin-bottom: 28px; box-shadow: var(--shadow);
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent2); color: white; font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .badge.b2 { background: var(--warm); }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .sub { color: var(--muted); font-size: 14px; }
+  .meta { margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .meta-item {
+    font-size: 12px; color: var(--muted);
+    background: #f4f3ef; border: 1px solid var(--line);
+    padding: 4px 10px; border-radius: 4px;
+  }
+  .meta-item strong { color: var(--ink); }
+  .legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    padding: 12px 16px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 6px; margin-bottom: 24px;
+    font-size: 12px; box-shadow: var(--shadow);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; color: var(--ink); }
+  .legend-swatch {
+    width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15);
+    flex-shrink: 0;
+  }
+  .legend-swatch.node { background: var(--node-fill); border-color: var(--node-stroke); }
+  .legend-swatch.decision { background: var(--decide-fill); border-color: var(--decide-stroke); }
+  .legend-swatch.hitl { background: var(--hitl-fill); border-color: var(--hitl-stroke); }
+  .legend-swatch.parallel { background: var(--parallel-fill); border-color: var(--parallel-stroke); }
+  .legend-swatch.final { background: var(--final-fill); border-color: var(--final-stroke); }
+  .legend-swatch.state { background: transparent; border: 2px dashed var(--gold); border-radius: 50%; width: 12px; height: 12px; }
+  .legend-line { width: 24px; height: 2px; background: var(--line); display: inline-block; border-radius: 1px; }
+  .legend-line.active { background: var(--accent2); }
+  .diagram-wrapper {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 28px; margin-bottom: 24px;
+    box-shadow: var(--shadow); overflow-x: auto;
+  }
+  .diagram-title {
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .diagram-title .dot { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; }
+  svg { display: block; }
+  .side-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 700px) { .side-panel { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 6px; padding: 16px; box-shadow: var(--shadow);
+  }
+  .card h3 {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--muted); margin-bottom: 10px;
+  }
+  .card table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .card th {
+    text-align: left; color: var(--muted); font-weight: 500;
+    padding: 4px 6px 4px 0; border-bottom: 1px solid var(--line);
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .card td { padding: 5px 6px 5px 0; border-bottom: 1px solid #eeeae3; vertical-align: top; }
+  .card tr:last-child td { border-bottom: none; }
+  .stage-tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 3px; margin-right: 4px; letter-spacing: 0.03em;
+  }
+  .tag-intake { background: #d6eaf8; color: #1a5276; }
+  .tag-proof { background: #e8f8f5; color: #1e6f5c; }
+  .tag-policy { background: #fef9e7; color: #7d6608; }
+  .tag-stock { background: #f4ecf7; color: #6c3483; }
+  .tag-defect { background: #fdebd0; color: #9c4a00; }
+  .tag-hitl { background: #f5eef8; color: #5b2c6f; }
+  .tag-notify { background: #eaf2f8; color: #1f618d; }
+  .tag-final { background: #fef9e7; color: #7d6608; }
+  .output-sample {
+    background: #f7f6f2; border-left: 3px solid var(--accent2);
+    padding: 10px 14px; border-radius: 0 4px 4px 0;
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 12px; line-height: 1.6; margin-top: 8px; overflow-x: auto;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  .output-sample .k { color: #1a5276; }
+  .output-sample .v { color: #1a1a1a; }
+  .output-sample .b { color: #6b6b6b; }
+  .output-sample .flag-true { color: #1e6f5c; font-weight: 600; }
+  .output-sample .flag-false { color: #c0392b; }
+  .stage-bites {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px; margin-bottom: 24px;
+  }
+  .bite {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+    padding: 14px 16px; box-shadow: var(--shadow);
+  }
+  .bite-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .bite-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .bite-icon.intake { background: #d6eaf8; color: #1a5276; }
+  .bite-icon.proof { background: #e8f8f5; color: #1e6f5c; }
+  .bite-icon.policy { background: #fef9e7; color: #7d6608; }
+  .bite-icon.stock { background: #f4ecf7; color: #6c3483; }
+  .bite-icon.defect { background: #fdebd0; color: #9c4a00; }
+  .bite-icon.hitl { background: #f5eef8; color: #5b2c6f; }
+  .bite-icon.notify { background: #eaf2f8; color: #1f618d; }
+  .bite h4 { font-size: 13px; font-weight: 600; }
+  .bite p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .bite-tools { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .tool-tag {
+    font-size: 10.5px; background: #f0ede8; border: 1px solid var(--line);
+    padding: 2px 7px; border-radius: 3px; color: var(--muted);
+    font-family: 'SF Mono', monospace;
+  }
+  .bite-out {
+    margin-top: 8px; font-size: 11.5px; color: var(--ink);
+    background: #f7f6f2; padding: 8px 10px; border-radius: 4px;
+    border-left: 2px solid var(--accent2);
+  }
+  .bite-out .label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .comparison {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 20px 24px; margin-top: 8px; box-shadow: var(--shadow);
+  }
+  .comparison h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .comparison .cmp-sub { color: var(--muted); font-size: 12.5px; margin-bottom: 16px; }
+  .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .cmp-col { padding: 16px; border-right: 1px solid var(--line); }
+  .cmp-col:last-child { border-right: none; }
+  .cmp-col h4 { font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+  .cmp-col.vA h4 { color: var(--accent2); }
+  .cmp-col.vB h4 { color: var(--warm); }
+  .cmp-col ul { list-style: none; font-size: 12px; }
+  .cmp-col li { padding: 3px 0 3px 14px; position: relative; color: var(--ink); }
+  .cmp-col li::before { content: '–'; position: absolute; left: 0; color: var(--muted); font-weight: 600; }
+  .cmp-col li.go::before { content: '+'; color: var(--accent3); }
+  .cmp-col li.caution::before { content: '!'; color: var(--warm); }
+  footer {
+    margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line);
+    font-size: 11.5px; color: var(--muted);
+  }
+  .story-card {
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 14px 16px; background: #faf9f6; margin-bottom: 12px;
+  }
+  .story-card .who { font-size: 12px; font-weight: 600; color: var(--accent2); margin-bottom: 4px; }
+  .story-card .what { font-size: 12.5px; color: var(--ink); }
+  .story-card .before { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+  .story-card .after { font-size: 11.5px; color: var(--accent3); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div>
+    <span class="badge">Version A · Single Orchestrator</span>
+    <span class="badge b2" style="margin-left:6px;">v1 · Pragmatic Build</span>
+    <h1 style="margin-top:10px;">Sallie se Schoenen — Returns Agentic Pipeline</h1>
+    <p class="sub">One orchestrator · Six functional nodes · Shared case state · Phased deployment</p>
+    <div class="meta">
+      <span class="meta-item"><strong>Architecture:</strong> Single LangGraph state machine, one agent runtime</span>
+      <span class="meta-item"><strong>Agents:</strong> 1 orchestrator (6 capability nodes, not separate agents)</span>
+      <span class="meta-item"><strong>State:</strong> ReturnCaseState — single shared source of truth</span>
+      <span class="meta-item"><strong>HITL:</strong> Shared supervisor queue (Anouk + Robin)</span>
+    </div>
+  </div>
+</header>
+
+<div class="legend">
+  <span class="legend-item"><span class="legend-swatch node"></span> Agent node (tool execution / action)</span>
+  <span class="legend-item"><span class="legend-swatch decision"></span> Decision gate (branching)</span>
+  <span class="legend-item"><span class="legend-swatch hitl"></span> Human-in-the-loop escalation</span>
+  <span class="legend-item"><span class="legend-swatch parallel"></span> Parallel / dual-track execution</span>
+  <span class="legend-item"><span class="legend-swatch final"></span> Terminal resolution (customer notified)</span>
+  <span class="legend-item"><span class="legend-swatch state"></span> ReturnCaseState mutation point</span>
+  <span class="legend-item"><span class="legend-line"></span> Information flow</span>
+  <span class="legend-item"><span class="legend-line active"></span> Resolution flow (active path)</span>
+</div>
+
+<div class="stage-bites">
+  <div class="bite">
+    <div class="bite-head">
+      <div class="bite-icon intake">1</div>
+      <h4>Intake &amp; Condition Eval</h4>
+    </div>
+    <p>Customer presents shoes at till. Eva captures receipt images + shoe photos + customer identifiers. First node consumes raw intake and produces a structured condition verdict.</p>
+    <div class="bite-tools">
+      <span class="tool-tag">verify_receipt_data()</span>
+      <span class="tool-tag">analyze_shoe_condition()</span>
+      <span class="tool-tag">route_ticket()</span>
+    </div>
+    <div class="bite-out">
+      <div class="label">Output →</div>
+      <strong>ReturnCaseState v1</strong> written: items[], receipt_verified (bool), condition_verdict { is_worn, defect_suspected, condition_score, confidence }, customer_id, origin_store_id
+    </div>
+  </div>
+  <div class="bite">
+    <div class="bite-head">
+      <div class="bite-icon proof">2</div>
+      <h4>Cross-Store Proof Lookup</h4>
+    </div>
+    <p>If receipt is missing or unreadable, agent attempts federated search across all 4 Randstad stores + e-comm records using partial identifiers. No phone calls required.</p>
+    <div class="bite-tools">
+      <span class="tool-tag">federated_sales_search()</span>
+      <span class="tool-tag">payment_token_lookup()</span>
+      <span class="tool-tag">generate_replacement_proof()</span>
+    </div>
+    <div class="bite-out">
+      <div class="label">Output →</div>
+      <strong>If found:</strong> transaction enriched in state, <code>proof_verified = True</code>, replacement proof artifact minted → re-enters policy_check.<br>
+      <strong>If not found:</strong> routes to HITL with full context; customer notified of pending lookup.
+    </div>
+  </div>
+  <div class="bite">
+    <div class="bite-head">
+      <div class="bite-icon policy">3</div>
+      <h4>Policy Rule Check</h4>
+    </div>
+    <p>Applies the 30-day window, unworn requirement, return-type preference, and €150 refund cap. Routes to the correct resolution path. Rules are deterministic.</p>
+    <div class="bite-tools">
+      <span class="tool-tag">compute_days_since_purchase()</span>
+      <span class="tool-tag">evaluate_policy_compliance()</span>
+      <span class="tool-tag">check_refund_cap()</span>
+    </div>
+    <div class="bite-out">
+      <div class="label">Output →</div>
+      <strong>Routes to:</strong> stock_resolve (exchange), execute_till_refund (refund ≤ €150), defect_assess (defect suspected), hitl_escalate (out of policy / worn / over cap).
+    </div>
+  </div>
+  <div class="bite">
+    <div class="bite-head">
+      <div class="bite-icon stock">4a</div>
+      <h4>Inventory &amp; Logistics Resolve</h4>
+    </div>
+    <p>For exchange cases: queries real-time stock across all 4 stores + warehouse. Attempts atomic hold (48h TTL) on best alternative location. Creates transfer manifest if hold succeeds.</p>
+    <div class="bite-tools">
+      <span class="tool-tag">query_stock_matrix()</span>
+      <span class="tool-tag">acquire_atomic_hold()</span>
+      <span class="tool-tag">create_interstore_transfer_manifest()</span>
+    </div>
+    <div class="bite-out">
+      <div class="label">Output →</div>
+      <strong>Hold succeeds:</strong> transfer manifest + 48h hold ID → customer notified with collection date.<br>
+      <strong>No stock:</strong> alternative_offer (store credit / different product).<br>
+      <strong>API down:</strong> hitl_escalate — never silent failure.
+    </div>
+  </div>
+  <div class="bite">
+    <div class="bite-head">
+      <div class="bite-icon defect">4b</div>
+      <h4>Defect Assessment &amp; RMA</h4>
+    </div>
+    <p>For defect-suspected cases: checks photo quality first, then runs multimodal defect classification. Separate parallel track handles supplier RMA assembly. Confidence threshold gates HITL.</p>
+    <div class="bite-tools">
+      <span class="tool-tag">check_photo_quality_compliance()</span>
+      <span class="tool-tag">classify_structural_defect()</span>
+      <span class="tool-tag">submit_supplier_rma_claim()</span>
+      <span class="tool-tag">notify_purchasing_lead()</span>
+    </div>
+    <div class="bite-out">
+      <div class="label">Output →</div>
+      <strong>Conf ≥ 0.85:</strong> till remedy authorized + RMA auto-submitted (parallel).<br>
+      <strong>Conf &lt; 0.85:</strong> HITL to Anouk for physical inspection; re-capture prompts if images insufficient.
+    </div>
+  </div>
+  <div class="bite">
+    <div class="bite-head">
+      <div class="bite-icon hitl">5</div>
+      <h4>HITL Escalation (Shared Queue)</h4>
+    </div>
+    <p>Any case that cannot be fully resolved by the agent — no proof match, worn item disputed, over-€150 refund, borderline defect — routes to a single supervisor dashboard. Anouk or Robin action it; case re-enters the flow at the appropriate node.</p>
+    <div class="bite-tools">
+      <span class="tool-tag">escalate_to_supervisor()</span>
+      <span class="tool-tag">supervisor_action_callback()</span>
+    </div>
+    <div class="bite-out">
+      <div class="label">Output →</div>
+      <strong>Case posted to:</strong> Anouk's supervisor dashboard with full state, elapsed time, what was tried. After resolution: case re-enters state machine, customer notified of outcome.
+    </div>
+  </div>
+  <div class="bite">
+    <div class="bite-head">
+      <div class="bite-icon notify">6</div>
+      <h4>Customer Notification</h4>
+    </div>
+    <p>Every terminal resolution emits a notification before the case closes. No silent closures. Channels: SMS + email. Also fires on hold expiry and on HITL status changes.</p>
+    <div class="bite-tools">
+      <span class="tool-tag">notify_customer_sms()</span>
+      <span class="tool-tag">notify_customer_email()</span>
+    </div>
+    <div class="bite-out">
+      <div class="label">Output →</div>
+      <strong>Notification sent:</strong> refund confirmed / exchange ticket issued / defect remedy authorized / claim submitted / hold expired / case escalated. <code>customer_notified = True</code> → case can close.
+    </div>
+  </div>
+</div>
+
+<div class="diagram-wrapper">
+  <div class="diagram-title"><span class="dot"></span> End-to-End State Machine — Version A · Single Orchestrator</div>
+  <svg viewBox="0 0 1100 760" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Version A workflow diagram">
+    <defs>
+      <filter id="soft" x="-4%" y="-4%" width="108%" height="108%">
+        <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.10"/>
+      </filter>
+      <marker id="arrowNode" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b6b6b"/>
+      </marker>
+      <marker id="arrowActive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a5276"/>
+      </marker>
+      <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#c0392b"/>
+      </marker>
+      <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d3c98"/>
+      </marker>
+      <marker id="arrowGold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#b7950b"/>
+      </marker>
+      <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e6f5c"/>
+      </marker>
+    </defs>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="0.5" fill="#e0ddd5" opacity="0.5"/>
+    </pattern>
+    <rect width="1100" height="760" fill="url(#dots)" opacity="0.4" pointer-events="none"/>
+
+    <!-- State banner -->
+    <rect x="340" y="14" width="420" height="22" rx="11" fill="#faf9f6" stroke="#d4d0c8" stroke-dasharray="4 3"/>
+    <text x="550" y="29" text-anchor="middle" font-size="10" font-family="monospace" fill="#6b6b6b">ReturnCaseState — single shared source of truth (mutated at each ● node)</text>
+
+    <!-- Trigger -->
+    <rect x="470" y="52" width="160" height="36" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <text x="550" y="70" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4a4a4a">Customer presents item at till</text>
+    <text x="550" y="83" text-anchor="middle" font-size="9.5" fill="#6b6b6b">Eva captures: receipt images · shoe photos · customer ID</text>
+    <circle cx="462" cy="70" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <text x="452" y="73" font-size="9" fill="#b7950b" font-family="monospace">state</text>
+    <line x1="550" y1="88" x2="550" y2="110" stroke="#6b6b6b" stroke-width="1.5" marker-end="url(#arrowNode)"/>
+
+    <!-- Intake -->
+    <rect x="370" y="112" width="360" height="54" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <rect x="370" y="112" width="360" height="20" rx="8" fill="#d6eaf8"/>
+    <text x="386" y="126" font-size="11" font-weight="600" fill="#1a5276">① Intake &amp; Condition Eval</text>
+    <text x="550" y="140" text-anchor="middle" font-size="10" fill="#4a4a4a">verify_receipt_data(receipt_id, purchase_date)</text>
+    <text x="550" y="152" text-anchor="middle" font-size="10" fill="#4a4a4a">analyze_shoe_condition(image_urls[]) → { is_worn, defect_suspected, condition_score, confidence }</text>
+    <circle cx="740" cy="139" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <text x="748" y="142" font-size="9" fill="#b7950b" font-family="monospace">state+1</text>
+    <line x1="550" y1="166" x2="550" y2="200" stroke="#1a5276" stroke-width="1.5" marker-end="url(#arrowActive)" stroke-dasharray="5 3"/>
+    <text x="570" y="186" font-size="9.5" fill="#1a5276" font-weight="600">proof verified</text>
+    <line x1="550" y1="166" x2="200" y2="230" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="355" y="200" font-size="9.5" fill="#c0392b" font-weight="600">proof missing / unreadable</text>
+
+    <!-- Cross-store -->
+    <rect x="60" y="200" width="280" height="74" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <rect x="60" y="200" width="280" height="20" rx="8" fill="#e8f8f5"/>
+    <text x="76" y="214" font-size="11" font-weight="600" fill="#1e6f5c">② Cross-Store Proof Lookup</text>
+    <text x="200" y="232" text-anchor="middle" font-size="10" fill="#4a4a4a">federated_sales_search(customer_id, date_range)</text>
+    <text x="200" y="246" text-anchor="middle" font-size="10" fill="#4a4a4a">payment_token_lookup(card_last_four, bank_ref)</text>
+    <text x="200" y="260" text-anchor="middle" font-size="10" fill="#4a4a4a">generate_replacement_proof(tx_id) → digital artifact</text>
+    <circle cx="350" cy="237" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <text x="358" y="240" font-size="9" fill="#b7950b" font-family="monospace">state+2</text>
+    <line x1="340" y1="237" x2="370" y2="237" stroke="#1e6f5c" stroke-width="1.5" marker-end="url(#arrowGreen)" stroke-dasharray="5 3"/>
+    <text x="355" y="228" font-size="9.5" fill="#1e6f5c" font-weight="600">match found</text>
+    <line x1="150" y1="274" x2="150" y2="380" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+    <!-- Policy -->
+    <rect x="370" y="202" width="360" height="54" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <rect x="370" y="202" width="360" height="20" rx="8" fill="#fef9e7"/>
+    <text x="386" y="216" font-size="11" font-weight="600" fill="#7d6608">③ Policy Rule Check</text>
+    <text x="550" y="230" text-anchor="middle" font-size="10" fill="#4a4a4a">compute_days_since_purchase() · evaluate_policy_compliance() · check_refund_cap()</text>
+    <text x="550" y="244" text-anchor="middle" font-size="10" fill="#4a4a4a">Rules: 30-day window · unworn required · refund cap €150 · return-type preference</text>
+    <circle cx="740" cy="229" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <text x="748" y="232" font-size="9" fill="#b7950b" font-family="monospace">state+3</text>
+    <line x1="460" y1="256" x2="250" y2="340" stroke="#1e6f5c" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+    <text x="320" y="298" font-size="9.5" fill="#1e6f5c" font-weight="600">refund ≤ €150 · refund desired</text>
+    <line x1="640" y1="256" x2="640" y2="330" stroke="#1a5276" stroke-width="1.5" marker-end="url(#arrowActive)"/>
+    <text x="660" y="296" font-size="9.5" fill="#1a5276" font-weight="600">exchange desired · within policy</text>
+    <line x1="700" y1="256" x2="860" y2="330" stroke="#9c4a00" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="755" y="295" font-size="9.5" fill="#9c4a00" font-weight="600">defect suspected</text>
+    <line x1="550" y1="256" x2="550" y2="340" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="575" y="300" font-size="9.5" fill="#c0392b" font-weight="600">out of policy / over cap / worn dispute</text>
+
+    <!-- No match decision -->
+    <polygon points="110,380 190,355 190,405" fill="#f5eef8" stroke="#7d3c98" stroke-width="1.5" filter="url(#soft)"/>
+    <text x="150" y="378" text-anchor="middle" font-size="10" font-weight="600" fill="#5b2c6f">No match</text>
+    <line x1="150" y1="397" x2="150" y2="420" stroke="#7d3c98" stroke-width="1.5" marker-end="url(#arrowPurple)"/>
+
+    <!-- HITL -->
+    <rect x="60" y="420" width="280" height="60" rx="8" fill="#f5eef8" stroke="#7d3c98" filter="url(#soft)"/>
+    <rect x="60" y="420" width="280" height="20" rx="8" fill="#f5eef8" stroke="#7d3c98"/>
+    <text x="76" y="434" font-size="11" font-weight="600" fill="#5b2c6f">⑤ HITL — Supervisor Queue (Anouk / Robin)</text>
+    <text x="200" y="450" text-anchor="middle" font-size="10" fill="#4a4a4a">Case posted with full state · elapsed time · actions attempted</text>
+    <text x="200" y="464" text-anchor="middle" font-size="10" fill="#4a4a4a">Anouk actions → case re-enters flow at appropriate node</text>
+    <circle cx="350" cy="450" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <line x1="150" y1="480" x2="150" y2="530" stroke="#7d3c98" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrowPurple)"/>
+    <text x="100" y="505" font-size="9" fill="#7d3c98">re-entry → proof_ok / policy / defect</text>
+    <line x1="220" y1="480" x2="470" y2="530" stroke="#7d3c98" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrowPurple)"/>
+    <text x="280" y="505" font-size="9" fill="#7d3c98">re-entry → stock_resolve</text>
+    <line x1="150" y1="480" x2="860" y2="525" stroke="#7d3c98" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrowPurple)"/>
+    <text x="520" y="495" font-size="9" fill="#7d3c98">re-entry → defect_track</text>
+
+    <!-- Stock resolve -->
+    <rect x="540" y="332" width="220" height="54" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <rect x="540" y="332" width="220" height="20" rx="8" fill="#d6eaf8"/>
+    <text x="556" y="346" font-size="11" font-weight="600" fill="#1a5276">④a Stock &amp; Logistics</text>
+    <text x="650" y="364" text-anchor="middle" font-size="10" fill="#4a4a4a">query_stock_matrix(sku, size) → 4 stores + warehouse</text>
+    <text x="650" y="378" text-anchor="middle" font-size="10" fill="#4a4a4a">acquire_atomic_hold(sku, store, ttl=48h)</text>
+    <circle cx="770" cy="359" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <text x="778" y="362" font-size="9" fill="#b7950b" font-family="monospace">state+4a</text>
+    <line x1="650" y1="386" x2="650" y2="430" stroke="#1a5276" stroke-width="1.5" marker-end="url(#arrowActive)"/>
+    <text x="670" y="410" font-size="9.5" fill="#1a5276" font-weight="600">hold confirmed</text>
+    <line x1="540" y1="359" x2="470" y2="430" stroke="#b7950b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="480" y="400" font-size="9.5" fill="#b7950b" font-weight="600">no network stock</text>
+    <line x1="760" y1="386" x2="860" y2="430" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="855" y="410" font-size="9.5" fill="#c0392b" font-weight="600">API down</text>
+
+    <!-- Transfer manifest -->
+    <rect x="540" y="430" width="220" height="46" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <rect x="540" y="430" width="220" height="20" rx="8" fill="#e8f8f5"/>
+    <text x="556" y="444" font-size="11" font-weight="600" fill="#1e6f5c">Transfer Manifest + Customer Hold</text>
+    <text x="650" y="462" text-anchor="middle" font-size="10" fill="#4a4a4a">create_interstore_transfer_manifest()</text>
+    <text x="650" y="476" text-anchor="middle" font-size="10" fill="#4a4a4a">48h atomic hold · customer notified with collection date</text>
+    <circle cx="770" cy="453" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <line x1="650" y1="476" x2="650" y2="520" stroke="#1e6f5c" stroke-width="1.5" marker-end="url(#arrowGreen)" stroke-dasharray="5 3"/>
+    <text x="670" y="500" font-size="9.5" fill="#1e6f5c" font-weight="600">transfer dispatched</text>
+
+    <!-- Alternative offer -->
+    <rect x="370" y="430" width="100" height="46" rx="8" fill="#fef9e7" stroke="#b7950b" filter="url(#soft)"/>
+    <text x="420" y="450" text-anchor="middle" font-size="10.5" font-weight="600" fill="#7d6608">Alternative Offer</text>
+    <text x="420" y="464" text-anchor="middle" font-size="9.5" fill="#4a4a4a">store credit / different model</text>
+    <text x="420" y="476" text-anchor="middle" font-size="9.5" fill="#4a4a4a">→ notify → final</text>
+    <line x1="420" y1="476" x2="250" y2="520" stroke="#b7950b" stroke-width="1.5" marker-end="url(#arrowGold)" stroke-dasharray="5 3"/>
+
+    <!-- API down to HITL -->
+    <line x1="860" y1="430" x2="600" y2="530" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="730" y="475" font-size="9.5" fill="#c0392b" font-weight="600">Anouk manual check</text>
+
+    <!-- Defect track -->
+    <rect x="820" y="330" width="240" height="90" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <rect x="820" y="330" width="240" height="20" rx="8" fill="#fdebd0"/>
+    <text x="836" y="344" font-size="11" font-weight="600" fill="#9c4a00">④b Defect Track</text>
+    <text x="940" y="360" text-anchor="middle" font-size="10" fill="#4a4a4a">check_photo_quality_compliance(images[])</text>
+    <text x="940" y="374" text-anchor="middle" font-size="10" fill="#4a4a4a">classify_structural_defect(images[], desc)</text>
+    <text x="940" y="388" text-anchor="middle" font-size="10" fill="#4a4a4a">→ { fault_type, confidence, is_manufacturing_fault }</text>
+    <circle cx="1070" cy="375" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <line x1="820" y1="375" x2="790" y2="375" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="800" y="371" font-size="9.5" fill="#c0392b" font-weight="600">quality fail → re-capture</text>
+    <text x="800" y="383" font-size="9" fill="#c0392b">(loops back to intake)</text>
+    <line x1="1050" y1="375" x2="1050" y2="430" stroke="#1e6f5c" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+
+    <!-- Parallel RMA -->
+    <rect x="820" y="430" width="240" height="100" rx="8" fill="#e8f8f0" stroke="#1e6f5c" filter="url(#soft)"/>
+    <rect x="820" y="430" width="240" height="20" rx="8" fill="#e8f8f0" stroke="#1e6f5c"/>
+    <text x="836" y="444" font-size="11" font-weight="600" fill="#1e6f5c">∥ Supplier RMA (Parallel Track)</text>
+    <text x="940" y="460" text-anchor="middle" font-size="10" fill="#4a4a4a">Assemble evidence package</text>
+    <text x="940" y="474" text-anchor="middle" font-size="10" fill="#4a4a4a">images · receipt metadata · defect classification</text>
+    <text x="940" y="488" text-anchor="middle" font-size="10" fill="#4a4a4a">submit_supplier_rma_claim(supplier_id, case_data)</text>
+    <text x="940" y="502" text-anchor="middle" font-size="10" fill="#4a4a4a">notify_purchasing_lead(claim_id, status) → Robin</text>
+    <line x1="940" y1="530" x2="760" y2="575" stroke="#1e6f5c" stroke-width="1.5" marker-end="url(#arrowGreen)" stroke-dasharray="5 3"/>
+    <text x="830" y="555" font-size="9.5" fill="#1e6f5c" font-weight="600">RMA submitted · claim tracked</text>
+    <line x1="940" y1="430" x2="700" y2="480" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrowRed)"/>
+    <text x="780" y="452" font-size="9" fill="#c0392b">conf &lt; 0.85 → Anouk</text>
+    <text x="780" y="464" font-size="9" fill="#c0392b">physical inspection</text>
+
+    <!-- Till refund -->
+    <rect x="120" y="332" width="180" height="54" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <rect x="120" y="332" width="180" height="20" rx="8" fill="#eaf2f8"/>
+    <text x="136" y="346" font-size="11" font-weight="600" fill="#1f618d">Execute Till Refund</text>
+    <text x="210" y="364" text-anchor="middle" font-size="10" fill="#4a4a4a">execute_till_refund(amount, tender)</text>
+    <text x="210" y="378" text-anchor="middle" font-size="10" fill="#4a4a4a">Capped at €150 auto · over cap → HITL</text>
+    <circle cx="310" cy="359" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <line x1="210" y1="386" x2="210" y2="430" stroke="#1e6f5c" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+    <text x="225" y="410" font-size="9.5" fill="#1e6f5c" font-weight="600">refund complete</text>
+    <line x1="120" y1="359" x2="120" y2="420" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="70" y="400" font-size="9.5" fill="#c0392b" font-weight="600">over €150</text>
+
+    <!-- Update inventory -->
+    <rect x="120" y="430" width="180" height="46" rx="8" fill="#f0ede8" stroke="#b8b0a0" filter="url(#soft)"/>
+    <rect x="120" y="430" width="180" height="20" rx="8" fill="#e8f8f5"/>
+    <text x="136" y="444" font-size="11" font-weight="600" fill="#1e6f5c">Update Local Inventory</text>
+    <text x="210" y="462" text-anchor="middle" font-size="10" fill="#4a4a4a">Return shoes to store inventory</text>
+    <text x="210" y="476" text-anchor="middle" font-size="10" fill="#4a4a4a">Update stock counts in WMS/ERP</text>
+    <circle cx="310" cy="453" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <line x1="210" y1="476" x2="210" y2="520" stroke="#1e6f5c" stroke-width="1.5" marker-end="url(#arrowGreen)" stroke-dasharray="5 3"/>
+
+    <!-- Notify + final -->
+    <rect x="120" y="520" width="360" height="50" rx="8" fill="#fef9e7" stroke="#b7950b" filter="url(#soft)"/>
+    <rect x="120" y="520" width="360" height="20" rx="8" fill="#fef9e7" stroke="#b7950b"/>
+    <text x="136" y="534" font-size="11" font-weight="600" fill="#7d6608">⑥ Notify Customer → Case Close</text>
+    <text x="300" y="550" text-anchor="middle" font-size="10" fill="#4a4a4a">notify_customer( outcome, delivery_details )</text>
+    <text x="300" y="564" text-anchor="middle" font-size="10" fill="#4a4a4a">customer_notified = True · case.closed = True</text>
+    <circle cx="490" cy="545" r="6" fill="none" stroke="#b7950b" stroke-width="2" stroke-dasharray="3 2"/>
+    <polygon points="490,590 470,610 510,610" fill="#fef9e7" stroke="#b7950b" stroke-width="1.5" filter="url(#soft)"/>
+    <text x="490" y="604" text-anchor="middle" font-size="10" font-weight="600" fill="#7d6608">TERMINAL</text>
+    <text x="490" y="616" text-anchor="middle" font-size="9" fill="#4a4a4a">Case resolved · customer notified</text>
+    <line x1="210" y1="570" x2="210" y2="590" stroke="#b7950b" stroke-width="1.5" marker-end="url(#arrowGold)"/>
+    <line x1="650" y1="570" x2="510" y2="590" stroke="#b7950b" stroke-width="1.5" marker-end="url(#arrowGold)"/>
+    <line x1="420" y1="570" x2="470" y2="590" stroke="#b7950b" stroke-width="1.5" marker-end="url(#arrowGold)"/>
+    <line x1="760" y1="575" x2="510" y2="590" stroke="#1e6f5c" stroke-width="1.5" marker-end="url(#arrowGreen)" stroke-dasharray="5 3"/>
+
+    <!-- Dead-letter -->
+    <rect x="760" y="530" width="170" height="46" rx="8" fill="#fdebd0" stroke="#9c4a00" filter="url(#soft)"/>
+    <text x="845" y="546" text-anchor="middle" font-size="10.5" font-weight="600" fill="#9c4a00">Dead-Letter: Lock Expired</text>
+    <text x="845" y="562" text-anchor="middle" font-size="9.5" fill="#4a4a4a">48h TTL expires · inventory released</text>
+    <text x="845" y="574" text-anchor="middle" font-size="9.5" fill="#4a4a4a">customer_notified: hold expired</text>
+    <line x1="845" y1="576" x2="510" y2="590" stroke="#9c4a00" stroke-width="1.5" marker-end="url(#arrowRed)" stroke-dasharray="4 3"/>
+    <text x="845" y="600" text-anchor="middle" font-size="9" fill="#c0392b" font-style="italic">Inventory returns to active WMS/ERP — no phantom stockout</text>
+
+    <!-- Foot annotations -->
+    <text x="60" y="670" font-size="10" fill="#6b6b6b" font-family="monospace">INPUT FLOW</text>
+    <line x1="60" y1="674" x2="260" y2="674" stroke="#6b6b6b" stroke-width="1"/>
+    <text x="60" y="688" font-size="9.5" fill="#6b6b6b">customer_presented_item → intake_eval</text>
+    <text x="60" y="699" font-size="9.5" fill="#6b6b6b">receipt_images + shoe_photos + customer_id</text>
+    <text x="60" y="710" font-size="9.5" fill="#6b6b6b">customer_identifier (email / phone / card_hash)</text>
+    <text x="540" y="670" font-size="10" fill="#6b6b6b" font-family="monospace">STATE MUTATIONS</text>
+    <line x1="540" y1="674" x2="740" y2="674" stroke="#b7950b" stroke-width="1"/>
+    <text x="540" y="688" font-size="9.5" fill="#6b6b6b">case_id · customer_id · items[] · origin_store_id</text>
+    <text x="540" y="699" font-size="9.5" fill="#6b6b6b">proof_verified · condition_verdict · policy_result</text>
+    <text x="540" y="710" font-size="9.5" fill="#6b6b6b">hold_reservation_id · supplier_claim_id</text>
+    <text x="830" y="670" font-size="10" fill="#6b6b6b" font-family="monospace">OUTPUTS</text>
+    <line x1="830" y1="674" x2="1070" y2="674" stroke="#1a5276" stroke-width="1"/>
+    <text x="830" y="688" font-size="9.5" fill="#6b6b6b">refund_authorized · exchange_ticket · rma_claim_id</text>
+    <text x="830" y="699" font-size="9.5" fill="#6b6b6b">customer_notification_sent · case.closed</text>
+    <text x="830" y="710" font-size="9.5" fill="#6b6b6b">dead_letter_reason (if applicable)</text>
+  </svg>
+</div>
+
+<div class="diagram-wrapper">
+  <div class="diagram-title"><span class="dot"></span> Stage-by-Stage Information Flow &amp; Outputs</div>
+  <div class="side-panel">
+    <div class="card">
+      <h3>Input → Process → Output Matrix</h3>
+      <table>
+        <thead>
+          <tr><th>Stage</th><th>Input</th><th>Tool / Action</th><th>Output</th><th>State Mutation</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="stage-tag tag-intake">① Intake</span></td>
+            <td>Receipt images, shoe photos (3+), customer ID, reason code</td>
+            <td>verify_receipt_data · analyze_shoe_condition (CV)</td>
+            <td>Receipt validity result; condition score; is_worn flag; defect_suspected flag</td>
+            <td>proof_verified · condition_verdict { is_worn, defect_suspected, score, confidence }</td>
+          </tr>
+          <tr>
+            <td><span class="stage-tag tag-proof">② Cross-Store</span></td>
+            <td>customer_identifier, approx_date_range, card_last_four (optional)</td>
+            <td>federated_sales_search · payment_token_lookup · generate_replacement_proof</td>
+            <td>Matched transaction OR no-match signal; digital proof artifact (if found)</td>
+            <td>proof_verified = True; enriched transaction data; replacement_proof_ref</td>
+          </tr>
+          <tr>
+            <td><span class="stage-tag tag-policy">③ Policy</span></td>
+            <td>purchase_date, is_worn, defect_suspected, resolution_pref, refund_amount</td>
+            <td>compute_days_since_purchase · evaluate_policy_compliance · check_refund_cap</td>
+            <td>Route signal: REFUND / EXCHANGE / DEFECT / HITL; cap check result</td>
+            <td>resolution_type · escalation_reason (if HITL) · cap_authorization</td>
+          </tr>
+          <tr>
+            <td><span class="stage-tag tag-stock">④a Stock</span></td>
+            <td>sku, size, origin_store_id, dest_pref (customer location)</td>
+            <td>query_stock_matrix · acquire_atomic_hold · create_interstore_transfer_manifest</td>
+            <td>Stock matrix; hold_id (or no-stock flag); transfer manifest; collection date</td>
+            <td>hold_reservation_id · transfer_manifest_ref · stock_source_store_id</td>
+          </tr>
+          <tr>
+            <td><span class="stage-tag tag-defect">④b Defect</span></td>
+            <td>image_urls[], fault_description, receipt metadata (from state)</td>
+            <td>check_photo_quality_compliance · classify_structural_defect · submit_supplier_rma_claim</td>
+            <td>quality verdict; fault_type; confidence; RMA claim_id; purchasing notification</td>
+            <td>supplier_claim_id · defect_classification · rma_status · confidence_score</td>
+          </tr>
+          <tr>
+            <td><span class="stage-tag tag-hitl">⑤ HITL</span></td>
+            <td>Full ReturnCaseState; elapsed time; actions attempted; reason for escalation</td>
+            <td>escalate_to_supervisor · supervisor_action_callback</td>
+            <td>Anouk's resolution action; supervisor notes; resolution path chosen</td>
+            <td>escalation_resolved · supervisor_notes · resolution_path · resolution_time</td>
+          </tr>
+          <tr>
+            <td><span class="stage-tag tag-notify">⑥ Notify</span></td>
+            <td>outcome_type, delivery_details (refund / exchange / defect / claim / expiry), customer contact</td>
+            <td>notify_customer_sms · notify_customer_email</td>
+            <td>Notification delivery confirmation; customer_notified flag</td>
+            <td>customer_notification_status · notification_channel · notified_at</td>
+          </tr>
+          <tr>
+            <td><span class="stage-tag tag-final">◆ Close</span></td>
+            <td>All accumulated state fields</td>
+            <td>case.close() — only permitted when customer_notified = True</td>
+            <td>Case closed; final audit log entry; metrics emitted</td>
+            <td>case.closed = True · closed_at · final_audit_entry</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Guardrails &amp; Edge Cases</h3>
+      <table>
+        <thead><tr><th>Guardrail</th><th>Trigger</th><th>Action</th><th>Fallback</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Refund cap €150</strong></td><td>execute_till_refund amount &gt; €150</td><td>Route to HITL; do not auto-refund</td><td>Anouk digital approval via supervisor dashboard</td></tr>
+          <tr><td><strong>Defect conf &lt; 0.85</strong></td><td>classify_structural_defect confidence &lt; 0.85</td><td>Route to HITL (Anouk physical inspection)</td><td>High-res re-capture prompts sent to till UI</td></tr>
+          <tr><td><strong>Photo quality fail</strong></td><td>check_photo_quality_compliance = False</td><td>Hold case; prompt till UI to re-capture</td><td>Loops back to intake_eval; case stays open</td></tr>
+          <tr><td><strong>Stock API down</strong></td><td>query_stock_matrix throws / times out</td><td>Route to HITL; do not guess stock</td><td>Anouk manual phone check (old path as fallback)</td></tr>
+          <tr><td><strong>Hold expiry (48h)</strong></td><td>TTL elapsed; customer hasn't collected</td><td>Lock auto-expires; inventory released to WMS</td><td>Customer notified before expiry + at expiry</td></tr>
+          <tr><td><strong>No match (cross-store)</strong></td><td>federated_sales_search returns empty</td><td>Route to HITL; case stays open</td><td>Anouk manual store-by-store check</td></tr>
+          <tr><td><strong>Out of policy</strong></td><td>Worn item vs. change-of-mind; &gt;30 days; no defect claimed</td><td>Route to HITL; do not force resolution</td><td>Anouk supervisor review; policy exception decision</td></tr>
+          <tr><td><strong>No customer notification</strong></td><td>Attempt to close case with customer_notified = False</td><td>Block case closure</td><td>System prevents close; flag for ops review</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="diagram-wrapper">
+  <div class="diagram-title"><span class="dot"></span> Bottleneck Remediation — What Changes for Each Persona</div>
+  <div class="side-panel">
+    <div class="card">
+      <h3>Customer</h3>
+      <div class="story-card">
+        <div class="who">Pain point C1 — Till delays at peak</div>
+        <div class="what">Manual receipt inspection every return consumes till time.</div>
+        <div class="before">Before: Eva manually checks receipt, visually inspects shoe, may call supervisor — 8–15 min per return.</div>
+        <div class="after">Receipt verification + condition assessment automated by agent; Eva confirms and executes. Standard in-policy returns: &lt; 3 min.</div>
+      </div>
+      <div class="story-card">
+        <div class="who">Pain point C3 — Customer chases own proof</div>
+        <div class="what">No receipt → store phones other stores → customer told to find bank statements.</div>
+        <div class="before">Before: Customer leaves without resolution; returns days later with proof they had to dig up.</div>
+        <div class="after">Agent searches all 4 stores in one query; digital proof minted if found. If not found, case stays open with status update — customer doesn't need to chase.</div>
+      </div>
+      <div class="story-card">
+        <div class="who">Pain point C5 — Exchange holds evaporate</div>
+        <div class="what">Verbal hold on paper/spreadsheet; lost when Eva goes off-duty.</div>
+        <div class="before">Before: Customer returns for collection; pair is gone. Re-resolution required.</div>
+        <div class="after">Atomic hold with 48h TTL in system; customer gets collection date by SMS. Hold releases inventory back to WMS automatically if uncollected.</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Eva (Store Associate)</h3>
+      <div class="story-card">
+        <div class="who">Pain point E3+E4 — Phone store-by-store for stock</div>
+        <div class="what">Listed inventory untrustworthy; must call each store for manual shelf check.</div>
+        <div class="before">Before: 3–5 phone calls per exchange; 10–20 min; counts still unreliable.</div>
+        <div class="after">query_stock_matrix returns all locations in one call; atomic hold prevents double booking. Only fallback to phone if API is down.</div>
+      </div>
+      <div class="story-card">
+        <div class="who">Pain point E5 — Paper/spreadsheet holds</div>
+        <div class="what">No system of record for holds; lost between shifts.</div>
+        <div class="before">Before: Sticky note on till; spreadsheet cell; nothing survives shift change.</div>
+        <div class="after">Hold is a system record with reservation_id; survives any staff change; TTL enforced by system.</div>
+      </div>
+      <div class="story-card">
+        <div class="who">Pain point E6 — Blurry defect photos rejected</div>
+        <div class="what">Robin bounces back photos for quality; rework loop.</div>
+        <div class="before">Before: Eva takes photos; days later Robin emails "please re-capture from this angle."</div>
+        <div class="after">check_photo_quality_compliance runs before classification; till UI prompts for missing angles immediately. No bounce-back lag.</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Anouk (Supervisor)</h3>
+      <div class="story-card">
+        <div class="who">Pain point A1+A2 — Single gatekeeper bottleneck</div>
+        <div class="what">Every exception — missing proof, policy edge, till override, defect — goes to Anouk.</div>
+        <div class="before">Before: Anouk queues manually; customers wait or return later; peak hours overwhelm.</div>
+        <div class="after">Clear receipts, in-policy returns, confirmed defects (≥0.85) all auto-resolve. Only genuine edge cases reach Anouk's dashboard — with full context already assembled.</div>
+      </div>
+      <div class="story-card">
+        <div class="who">Pain point A3 — Manual defect judgment</div>
+        <div class="what">Anouk must visually decide worn vs. defective — subjective, inconsistent.</div>
+        <div class="before">Before: Anouk's judgment is the only standard; varies by day, by mood, by pair.</div>
+        <div class="after">CV classification provides structured evidence (fault_type, confidence) as decision-support. Anouk reviews the output, not the raw shoe from scratch. Consistency improves.</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Robin (Purchasing Manager)</h3>
+      <div class="story-card">
+        <div class="who">Pain point R1+R2 — Inconsistent evidence + no structured intake</div>
+        <div class="what">Emailed photos arrive randomly; no standard evidence package; Robin chases missing angles.</div>
+        <div class="before">Before: Incoming emails; Robin decides what's adequate; bounces back for more.</div>
+        <div class="after">Warranty Claims node assembles a structured evidence package (images + receipt metadata + defect classification) before anything reaches Robin. Robin sees a complete case, not a request for more info.</div>
+      </div>
+      <div class="story-card">
+        <div class="who">Pain point R3 — No visibility into claim status</div>
+        <div class="what">Store staff don't know if vendor credit lands; inventory write-off ambiguous.</div>
+        <div class="before">Before: Robin submits RMA; silence for weeks; store has no idea if it's approved.</div>
+        <div class="after">supplier_claim_id tracked in case state; notify_purchasing_lead fires on status change. Both Robin and the originating store see status in the case record.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="comparison">
+  <h2>Version A vs. Current As-Is — Bottleneck-by-Bottleneck</h2>
+  <p class="cmp-sub">Which bottlenecks does Version A actually resolve, and which does it not yet touch?</p>
+  <div class="cmp-grid">
+    <div class="cmp-col vA">
+      <h4>Resolved in Version A</h4>
+      <ul>
+        <li class="go"><strong>C1 — Till delays:</strong> Receipt + condition automated; standard returns under 3 min</li>
+        <li class="go"><strong>C3 — Customer chases proof:</strong> Federated search replaces phone tag; case stays open with status</li>
+        <li class="go"><strong>E3+E4 — Phone store-by-store:</strong> query_stock_matrix in one call; phone only as fallback</li>
+        <li class="go"><strong>E5 — Paper holds:</strong> Atomic hold with reservation_id in system; TTL enforced</li>
+        <li class="go"><strong>E6 — Blurry photos:</strong> Quality check runs before classification; re-capture prompts immediately</li>
+        <li class="go"><strong>A1 — Single gatekeeper:</strong> High-confidence paths auto-resolve; only edge cases reach Anouk</li>
+        <li class="go"><strong>R1+R2 — Evidence quality:</strong> Structured package assembled before anything reaches Robin</li>
+        <li class="go"><strong>C5 — Hold evasion:</strong> 48h TTL + customer notification; no silent losses</li>
+      </ul>
+    </div>
+    <div class="cmp-col vA">
+      <h4>Not Yet Resolved (Requires Infra / Future Phase)</h4>
+      <ul>
+        <li class="caution"><strong>C2 — Supervisor wait time:</strong> Reduced but not eliminated; some cases still hit Anouk</li>
+        <li class="caution"><strong>S1 — Data silos:</strong> Federated search only works if POS has a readable API — prerequisite</li>
+        <li class="caution"><strong>S2 — Untrusted inventory:</strong> Atomic hold requires WMS lock semantics; best-effort until WMS upgraded</li>
+        <li class="caution"><strong>S5 — Defect classifier accuracy:</strong> Needs labeled dataset; early phase = CV as decision-support only</li>
+        <li class="caution"><strong>S6 — Decoupled RMA track:</strong> Improved (evidence package + status tracking) but full automation needs supplier API</li>
+        <li class="caution"><strong>C4 — Customer timeline visibility:</strong> Notifications fixed; but no customer-facing self-service portal yet</li>
+        <li class="caution"><strong>GDPR / payment token review:</strong> Not addressed in this version — needs legal review before payment_token_lookup goes live</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <strong>Version A — Single Orchestrator Pipeline.</strong> One LangGraph state machine with six functional nodes operating on a shared ReturnCaseState. Designed for a four-store retailer with partial existing infrastructure. Build the shared case database first; add nodes in the order above. Full multi-agent separation (Version B) is a later-stage architecture when volume, store count, or team structure demands it.
+</footer>
+
+</div>
+</body>
+</html>

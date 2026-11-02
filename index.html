@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sallie se Schoenen — Returns Agent Preview</title>
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --panel: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #ddd9cf;
+    --accent: #c0392b;
+    --accent2: #1a5276;
+    --accent3: #1e6f5c;
+    --warm: #d35400;
+    --gold: #b7950b;
+    --hitl: #8e44ad;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--ink);
+    padding: 24px 20px 48px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 8px;
+    margin-bottom: 20px; box-shadow: var(--shadow);
+  }
+  .logo {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--accent2); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700;
+  }
+  header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  header p  { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+  .tabs {
+    display: flex; gap: 0; margin-bottom: 16px;
+    border-bottom: 2px solid var(--line); padding: 0 4px;
+  }
+  .tab {
+    padding: 10px 18px; background: transparent; border: none;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    cursor: pointer; border-radius: 6px 6px 0 0;
+    transition: all 0.15s; position: relative; top: 1px;
+  }
+  .tab.active {
+    color: var(--accent2); background: var(--panel);
+    box-shadow: 0 -2px 0 var(--accent2);
+  }
+  .tab:hover { color: var(--ink); }
+
+  .panel {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 20px; box-shadow: var(--shadow);
+    display: none;
+  }
+  .panel.active { display: block; }
+
+  .section-label {
+    font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+  .row.full { grid-template-columns: 1fr; }
+  @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+
+  label {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--ink); margin-bottom: 3px;
+  }
+  .hint { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+
+  input, select, textarea {
+    width: 100%; padding: 8px 10px; font-size: 13px;
+    background: #faf9f6; border: 1px solid var(--line);
+    border-radius: 5px; color: var(--ink);
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--accent2); background: white;
+  }
+  textarea { resize: vertical; min-height: 60px; font-family: 'SF Mono', monospace; font-size: 12px; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #f0ede8; border: 1px solid var(--line);
+    padding: 3px 8px; border-radius: 12px; font-size: 11.5px;
+    color: var(--muted);
+  }
+  .chip.active { background: #d6eaf8; border-color: #2980b9; color: var(--accent2); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 16px; font-size: 13px; font-weight: 600;
+    border: none; border-radius: 6px; cursor: pointer;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--accent2); color: white;
+  }
+  .btn-primary:hover { background: #154360; }
+  .btn-secondary {
+    background: #f0ede8; color: var(--ink); border: 1px solid var(--line);
+  }
+  .btn-secondary:hover { background: #e8e4dc; }
+  .btn-hil {
+    background: var(--hitl); color: white;
+  }
+  .btn-hil:hover { background: #7d3c98; }
+  .btn-warn { background: var(--warm); color: white; }
+  .btn-warn:hover { background: #a04000; }
+  .btn-sm { padding: 5px 10px; font-size: 11.5px; }
+
+  .status-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: #f7f6f2;
+    border: 1px solid var(--line); border-radius: 6px;
+    margin-bottom: 14px; font-size: 12.5px;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-pending { background: var(--gold); }
+  .dot-hitl { background: var(--hitl); }
+  .dot-closed { background: var(--accent3); }
+  .dot-running { background: var(--accent2); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 50% { opacity: 0.4; } }
+
+  .state-table {
+    width: 100%; border-collapse: collapse; font-size: 12.5px;
+    margin-bottom: 10px;
+  }
+  .state-table th {
+    text-align: left; color: var(--muted); font-weight: 500;
+    padding: 5px 8px; border-bottom: 1px solid var(--line);
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .state-table td {
+    padding: 5px 8px; border-bottom: 1px solid #eeeae3;
+    vertical-align: top; font-family: 'SF Mono', monospace; font-size: 11.5px;
+  }
+  .state-table tr:last-child td { border-bottom: none; }
+  .state-table td.label { color: var(--muted); font-family: inherit; font-size: 11px; }
+
+  .audit-log {
+    background: #f7f6f2; border: 1px solid var(--line);
+    border-radius: 6px; padding: 10px 12px;
+    max-height: 340px; overflow-y: auto; font-size: 12px;
+    font-family: 'SF Mono', monospace; line-height: 1.6;
+  }
+  .audit-log .entry {
+    padding: 4px 0; border-bottom: 1px solid #eeeae3;
+  }
+  .audit-log .entry:last-child { border-bottom: none; }
+  .audit-log .node { color: var(--accent2); font-weight: 600; }
+  .audit-log .decision { color: var(--ink); }
+  .audit-log .meta { color: var(--muted); }
+  .audit-log .flag-hitl { color: var(--hitl); font-weight: 600; }
+  .audit-log .flag-close { color: var(--accent3); font-weight: 600; }
+
+  .hitl-panel {
+    background: #f5eef8; border: 2px solid var(--hitl);
+    border-radius: 8px; padding: 16px; margin-top: 14px;
+  }
+  .hitl-title {
+    font-size: 13px; font-weight: 700; color: var(--hitl);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .hitl-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+  .result-panel {
+    background: #eafaf1; border: 2px solid var(--accent3);
+    border-radius: 8px; padding: 14px 16px; margin-top: 14px;
+  }
+  .result-title { font-size: 13px; font-weight: 700; color: var(--accent3); margin-bottom: 6px; }
+  .result-body { font-size: 13px; color: var(--ink); }
+
+  .toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--accent2); color: white; padding: 10px 16px;
+    border-radius: 6px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100;
+    opacity: 0; transform: translateY(8px);
+    transition: all 0.25s;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .node-vis {
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px;
+  }
+  .node-badge {
+    padding: 4px 10px; border-radius: 14px; font-size: 11px; font-weight: 600;
+    background: #f0ede8; color: var(--muted); border: 1px solid var(--line);
+  }
+  .node-badge.run { background: #d6eaf8; color: var(--accent2); border-color: #2980b9; }
+  .node-badge.hitl { background: #f5eef8; color: var(--hitl); border-color: #7d3c98; }
+  .node-badge.close { background: #eafaf1; color: var(--accent3); border-color: #1e6f5c; }
+
+  /* ── Chatbot panel ── */
+  .chat-messages {
+    display: flex; flex-direction: column; gap: 8px;
+    height: 380px; max-height: 420px; overflow-y: auto; overflow-x: hidden;
+  }
+  .chat-msg {
+    max-width: 90%; padding: 8px 12px; border-radius: 10px;
+    font-size: 13px; line-height: 1.5; word-wrap: break-word;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+  .chat-msg.chat-bot {
+    align-self: flex-start; background: #f0f4f8; color: var(--text);
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .chat-msg.chat-user {
+    align-self: flex-end; background: var(--accent2); color: #fff;
+    border: 1px solid var(--accent2);
+    flex-shrink: 0;
+  }
+  .chat-msg.chat-system {
+    align-self: center; background: #fef9e7; color: #7d6608;
+    border: 1px solid #f0d060; font-size: 12px; max-width: 95%;
+    flex-shrink: 0;
+  }
+  .chat-msg.chat-case {
+    align-self: stretch; max-width: 100%; width: 100%;
+    background: #eafaf1; color: var(--text);
+    border: 1px solid #1e6f5c; border-radius: 8px;
+    font-size: 12px; line-height: 1.5;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+  .chat-msg-label {
+    font-size: 10.5px; font-weight: 700; color: #1e6f5c;
+    margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .chat-msg-body {
+    color: var(--text);
+    width: 100%;
+    overflow-x: auto;
+  }
+  .chat-msg-body code {
+    background: #dde3ed; padding: 1px 5px; border-radius: 3px;
+    font-family: 'Courier New', monospace; font-size: 12px; color: var(--accent2);
+  }
+  .chat-input {
+    flex: 1; padding: 8px 12px; border: 1px solid var(--line);
+    border-radius: 6px; font-size: 13px; background: #fff; color: var(--text);
+  }
+  .chat-quick {
+    padding: 4px 10px; font-size: 12px; background: #eaf2f8; color: var(--accent2);
+    border: 1px solid #b8d4e8; border-radius: 12px; cursor: pointer;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .chat-quick:hover { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+  .chat-quick:active { transform: scale(0.97); }
+
+  /* ── Floating chatbot widget ── */
+  .chat-float-wrapper {
+    position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+  }
+  .chat-float {
+    width: 440px; max-width: 95vw; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    display: flex; flex-direction: column; overflow: hidden;
+    font-family: var(--body-font);
+    animation: chatFloatIn 0.2s ease-out;
+  }
+  @keyframes chatFloatIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .chat-float-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; background: var(--accent2); color: white;
+    cursor: default; flex-shrink: 0;
+  }
+  .chat-float-title { font-size: 13px; font-weight: 600; }
+  .chat-float-sub {
+    font-size: 10.5px; background: rgba(255,255,255,0.22);
+    padding: 2px 8px; border-radius: 10px; margin-left: auto;
+  }
+  .chat-float-min-btn {
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    width: 22px; height: 22px; border-radius: 50%;
+    cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .chat-float-min-btn:hover { background: rgba(255,255,255,0.38); }
+  .chat-float-body {
+    display: flex; flex-direction: column; padding: 12px;
+    overflow: hidden; max-height: 560px;
+  }
+  .chat-float-collapsed {
+    position: fixed; bottom: 20px; right: 20px; z-index: 1001;
+    background: var(--accent2); color: white; border-radius: 50%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    cursor: pointer; transition: transform 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-float-collapsed:hover { transform: scale(1.1); }
+  .chat-float-toggler {
+    width: 48px; height: 48px; border: none; background: transparent;
+    color: white; font-size: 22px; cursor: pointer; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-float-collapsed:hover .chat-float-toggler { background: rgba(255,255,255,0.18); }
+  @media (max-width: 480px) {
+    .chat-float { width: 92vw; right: 4vw; bottom: 12px; }
+    .chat-float-collapsed { right: 4vw; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo">S</div>
+  <div>
+    <h1>Sallie se Schoenen — Returns Agent Preview</h1>
+    <p>Version A · Single Orchestrator · 6 Nodes · Interactive Demo</p>
+  </div>
+  <div style="margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <a href="./version_a_workflow.html" target="_blank" style="text-decoration:none; color:var(--accent2); background:#eaf2f8; border:1px solid #2980b9; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:600;">📊 Workflow A Diagram</a>
+    <a href="./version_b_workflow.html" target="_blank" style="text-decoration:none; color:var(--hitl); background:#f5eef8; border:1px solid #7d3c98; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:600;">📐 Workflow B Architecture</a>
+    <a href="https://github.com/knarayanareddy/sallie-returns-ai-agent" target="_blank" style="text-decoration:none; color:#1a1a1a; background:#f0ede8; border:1px solid #c8c4bc; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:600;">🐙 GitHub Repo</a>
+    <span class="chip" id="status-chip">⏹ Idle</span>
+    <span id="js-indicator" style="display:none; font-size:11px; color:var(--accent3); background:#eafaf1; padding:2px 8px; border-radius:10px; border:1px solid #1e6f5c;">✓ Live Engine</span>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('config')">📋 Case Config</button>
+  <button class="tab" onclick="switchTab('run')">▶ Run Pipeline</button>
+  <button class="tab" onclick="switchTab('hitl')">👁 HITL Queue</button>
+  <button class="tab" onclick="switchTab('history')">📜 Case History</button>
+</div>
+
+<!-- ── CONFIG PANEL ── -->
+<div class="panel active" id="panel-config">
+  <div class="section-label">Case Identity</div>
+  <div class="row">
+    <div>
+      <label>Case ID <span class="hint">auto-generated if left blank</span></label>
+      <input type="text" id="cfg-case-id" placeholder="RC-CASE-001">
+    </div>
+    <div>
+      <label>Origin Store</label>
+      <select id="cfg-store">
+        <option value="STORE-Utrecht">Sallie se Schoenen — Utrecht</option>
+        <option value="STORE-Rotterdam">Sallie se Schoenen — Rotterdam</option>
+        <option value="STORE-Amsterdam">Sallie se Schoenen — Amsterdam</option>
+        <option value="STORE-Haarlem">Sallie se Schoenen — Haarlem</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Customer ID</label>
+      <input type="text" id="cfg-customer-id" placeholder="CUST-001" value="CUST-PREVIEW-001">
+    </div>
+    <div>
+      <label>Customer Email</label>
+      <input type="email" id="cfg-email" placeholder="customer@mail.nl" value="preview@demo.nl">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Customer Phone</label>
+      <input type="text" id="cfg-phone" placeholder="+31612345678" value="+31612345678">
+    </div>
+    <div>
+      <label>Preferred Resolution</label>
+      <select id="cfg-resolution">
+        <option value="">Auto-determine (from policy)</option>
+        <option value="REFUND">Refund</option>
+        <option value="EXCHANGE">Exchange</option>
+        <option value="DEFECT_REMEDY">Defect Remedy</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:12px;">Return Item</div>
+  <div class="row">
+    <div>
+      <label>SKU</label>
+      <input type="text" id="cfg-sku" placeholder="SS-0042" value="SS-0042">
+      <div class="hint">Try: SS-0042 (standard), SS-0087 (stock available at Rotterdam), SS-0091 (known defective), SS-0055 (worn), SS-0021 (no stock)</div>
+    </div>
+    <div>
+      <label>Size</label>
+      <input type="text" id="cfg-size" placeholder="EU-39" value="EU-39">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Purchase Price (EUR)</label>
+      <input type="number" id="cfg-price" step="0.01" min="0" value="89.95">
+    </div>
+    <div>
+      <label>Condition Description</label>
+      <input type="text" id="cfg-condition-desc" placeholder="Box opened, shoes clean" value="Box opened, shoes clean, no apparent wear">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Is Worn? <span class="hint">explicit CV hint</span></label>
+      <select id="cfg-is-worn">
+        <option value="">Auto (CV simulation)</option>
+        <option value="false">No — unworn</option>
+        <option value="true">Yes — worn</option>
+      </select>
+    </div>
+    <div>
+      <label>Packaging Intact?</label>
+      <select id="cfg-packaging">
+        <option value="">Auto</option>
+        <option value="true">Yes — intact</option>
+        <option value="false">No — damaged</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:12px;">Proof of Purchase</div>
+  <div class="row">
+    <div>
+      <label>Receipt ID</label>
+      <input type="text" id="cfg-receipt-id" placeholder="REC-883921 (valid in mock ledger)" value="REC-883921">
+      <div class="hint">Valid IDs in mock: REC-883921 (Utrecht, 7d), REC-910203 (Rotterdam, 12d), REC-778123 (Amsterdam, 22d), REC-661098 (Haarlem, 3d), REC-EC-44510 (Online, 19d)</div>
+    </div>
+    <div>
+      <label>Images <span class="hint">comma-separated fake URLs</span></label>
+      <input type="text" id="cfg-images" placeholder="shoe_top.jpg, shoe_side.jpg, shoe_sole.jpg" value="shoe_top.jpg, shoe_side.jpg, shoe_sole.jpg">
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:12px;">Actions</div>
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <button class="btn btn-primary" onclick="buildAndRun()">▶ Build Case + Run Full Pipeline</button>
+    <button class="btn btn-secondary" onclick="buildCase()">⚙ Build Case Only (see state)</button>
+    <button class="btn btn-secondary" onclick="resetConfig()">↺ Reset Config</button>
+  </div>
+</div>
+
+<!-- ── RUN PANEL ── -->
+<div class="panel" id="panel-run">
+  <div id="run-status"></div>
+  <div id="run-node-vis" class="node-vis"></div>
+  <div id="run-state"></div>
+  <div id="run-audit"></div>
+  <div id="run-hitl"></div>
+  <div id="run-result"></div>
+  <div style="margin-top:12px; display:flex; gap:8px;">
+    <button class="btn btn-primary" id="btn-run-resume" style="display:none;" onclick="resumeHitL()">▶ Resume from HITL (Anouk decision)</button>
+    <button class="btn btn-secondary" onclick="clearRun()">↺ Clear Run</button>
+  </div>
+</div>
+
+<!-- ── HITL PANEL ── -->
+<div class="panel" id="panel-hitl">
+  <div class="section-label">Supervisor Queue (Anouk / Robin)</div>
+  <p style="font-size:12.5px; color:var(--muted); margin-bottom:12px;">
+    When a case pauses at HITL, you act as the supervisor. Choose a resolution to resume the pipeline.
+  </p>
+  <div id="hitl-queue">
+    <div style="color:var(--muted); font-size:12.5px; padding:12px; background:#f7f6f2; border:1px solid var(--line); border-radius:6px;">
+      No cases in HITL queue. Run a pipeline to see HITL cases here.
+    </div>
+  </div>
+</div>
+
+<!-- ── HISTORY PANEL ── -->
+<div class="panel" id="panel-history">
+  <div class="section-label">Case History (this session)</div>
+  <div id="history-list">
+    <div style="color:var(--muted); font-size:12.5px; padding:12px; background:#f7f6f2; border:1px solid var(--line); border-radius:6px;">
+      No cases run yet.
+    </div>
+  </div>
+</div>
+
+<!-- ── FLOATING CHATBOT WIDGET ── -->
+<div class="chat-float-wrapper" id="chat-float-wrapper">
+  <div class="chat-float" id="chat-float">
+    <div class="chat-float-header">
+      <span class="chat-float-title">💬 Pipeline Chatbot</span>
+      <span class="chat-float-sub">operator + ops assistant</span>
+      <button class="chat-float-min-btn" onclick="minimizeChatFloat()" title="Minimize">✕</button>
+    </div>
+    <div class="chat-float-body" id="chat-float-body">
+      <div style="margin-bottom:10px; display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="chat-quick" onclick="chatQuick('show case V1')">🔍 show case V1</button>
+        <button class="chat-quick" onclick="chatQuick('show case V2')">🔍 show case V2</button>
+        <button class="chat-quick" onclick="chatQuick('show case V3')">🔍 show case V3</button>
+        <button class="chat-quick" onclick="chatQuick('show case V4')">🔍 show case V4</button>
+        <button class="chat-quick" onclick="chatQuick('show case V5')">🔍 show case V5</button>
+        <button class="chat-quick" onclick="chatQuick('list open cases')">📋 list open cases</button>
+        <button class="chat-quick" onclick="chatQuick('show HITL queue')">🚨 show HITL queue</button>
+        <button class="chat-quick" onclick="chatQuick('how does the pipeline work')">📖 how it works</button>
+        <button class="chat-quick" onclick="chatQuick('what are the guardrails')">🛡️ guardrails</button>
+      </div>
+      <div class="chat-messages" id="chat-messages" style="height:380px; overflow-y:auto; overflow-x:hidden; background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:8px; display:flex; flex-direction:column; gap:8px;">
+        <div class="chat-msg chat-bot">
+          <div class="chat-msg-label">💬 Pipeline Bot</div>
+          <div class="chat-msg-body">Welcome! I can help you with the returns pipeline. Try:<br>
+            • <code>show case V1</code> — full state + audit for case V1 (REFUND)<br>
+            • <code>show case V4</code> — full state + audit for case V4 (DEFECT)<br>
+            • <code>list open cases</code> — all cases still open<br>
+            • <code>show HITL queue</code> — cases awaiting supervisor<br>
+            • <code>how does the pipeline work</code> — overview of the 6 nodes<br>
+            • <code>what are the guardrails</code> — all guardrails explained<br>
+            • <code>which stores have stock of SS-0087</code> — inventory query<br>
+            • <code>what happened in V3</code> — audit trail narrative<br>
+            • <code>total cases run</code> — session stats</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <input id="chat-input" class="chat-input" placeholder="Ask anything about the pipeline…" autocomplete="off"
+               style="flex:1; padding:8px 12px; border:1px solid var(--line); border-radius:6px; font-size:13px; background:#fff; color:var(--text);">
+        <button class="btn btn-secondary" onclick="chatSend()" style="padding:8px 16px; font-size:13px;">Send</button>
+      </div>
+      <div style="font-size:11px; color:var(--muted); margin-top:6px; text-align:right;">
+        chatbot v1 · queries the live pipeline state + operational knowledge base
+      </div>
+    </div>
+    <div class="chat-float-collapsed" id="chat-float-collapsed" style="display:none;" onclick="expandChatFloat()">
+      <button class="chat-float-toggler" title="Open chatbot">💬</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Polyfills for legacy date/string formatting calls
+if (!String.prototype.strftime) {
+  String.prototype.strftime = function() { return this.toString(); };
+}
+if (!Date.prototype.strftime) {
+  Date.prototype.strftime = function() { return this.toLocaleTimeString(); };
+}
+
+// ── JS loaded indicator + click feedback ──────────────────────────────────────
+document.getElementById('js-indicator').style.display = 'inline-flex';
+let buttonLoading = false;
+
+// ── CLIENT-SIDE ENGINE (GitHub Pages / Standalone Preview) ───────────────────
+const MOCK_RECEIPTS = {
+  "REC-883921": {
+    receiptId: "REC-883921", storeId: "STORE-Utrecht", storeName: "Sallie se Schoenen — Utrecht",
+    sku: "SS-0042", size: "EU-39", amount: "89.95", daysAgo: 7, payment: "PIN_DEBIT",
+    customer: "CUST-MARIEKE-DJ", email: "marieke.dejong@mail.nl", phone: "+31612345678"
+  },
+  "REC-000555": {
+    receiptId: "REC-000555", storeId: "STORE-Rotterdam", storeName: "Sallie se Schoenen — Rotterdam",
+    sku: "SS-0055", size: "EU-44", amount: "69.00", daysAgo: 35, payment: "MASTERCARD",
+    customer: "CUST-JAN-K", email: "jan.koster@webmail.nl", phone: "+31622233444"
+  },
+  "REC-661098": {
+    receiptId: "REC-661098", storeId: "STORE-Haarlem", storeName: "Sallie se Schoenen — Haarlem",
+    sku: "SS-0091", size: "EU-41", amount: "119.50", daysAgo: 3, payment: "IDEAL",
+    customer: "CUST-SOFIE-VD", email: "sofie.vandijk@kpnmail.nl", phone: "+31633344555"
+  },
+  "REC-772104": {
+    receiptId: "REC-772104", storeId: "STORE-Amsterdam", storeName: "Sallie se Schoenen — Amsterdam",
+    sku: "SS-0087", size: "EU-42", amount: "135.00", daysAgo: 12, payment: "PIN_DEBIT",
+    customer: "CUST-DAAN-B", email: "daan.bakker@email.nl", phone: "+31698765432"
+  }
+};
+
+const MOCK_INVENTORY = {
+  "SS-0042": { "STORE-Utrecht": 4, "STORE-Rotterdam": 2, "STORE-Amsterdam": 0, "STORE-Haarlem": 1, "WAREHOUSE": 10 },
+  "SS-0087": { "STORE-Utrecht": 0, "STORE-Rotterdam": 2, "STORE-Amsterdam": 0, "STORE-Haarlem": 1, "WAREHOUSE": 2 },
+  "SS-0091": { "STORE-Utrecht": 1, "STORE-Rotterdam": 0, "STORE-Amsterdam": 2, "STORE-Haarlem": 0, "WAREHOUSE": 5 },
+  "SS-0055": { "STORE-Utrecht": 3, "STORE-Rotterdam": 1, "STORE-Amsterdam": 2, "STORE-Haarlem": 0, "WAREHOUSE": 8 }
+};
+
+const STORE_NAMES = {
+  "STORE-Utrecht": "Sallie se Schoenen — Utrecht",
+  "STORE-Rotterdam": "Sallie se Schoenen — Rotterdam",
+  "STORE-Amsterdam": "Sallie se Schoenen — Amsterdam",
+  "STORE-Haarlem": "Sallie se Schoenen — Haarlem",
+  "WAREHOUSE": "Central Warehouse"
+};
+
+const CHAT_KNOWLEDGE = {
+  "how does the pipeline work": (
+    "💬 <strong>How the Version A pipeline works</strong><br>" +
+    "The pipeline is a single-orchestrator state machine with 6 numbered nodes:<br>" +
+    "① <strong>Intake &amp; Condition</strong> — verify receipt (if present) and run CV condition assessment on images<br>" +
+    "② <strong>Cross-Store Proof</strong> — if receipt is missing, search all 4 Randstad stores + e-comm for a matching transaction<br>" +
+    "③ <strong>Policy Check</strong> — apply guardrails: 30-day window, unworn check, €150 refund cap, defect precedence<br>" +
+    "④a <strong>Stock &amp; Logistics</strong> — for exchanges: query stock across 4 stores + warehouse, acquire atomic hold, create transfer manifest<br>" +
+    "④b <strong>Defect Assess</strong> — for suspected defects: photo quality gate → classify structural defect → confidence ≥ 0.85 → auto-remedy + RMA<br>" +
+    "⑤a <strong>Till Refund</strong> — for refunds: cap check (€150) → authorize or HITL if over cap<br>" +
+    "⑤b <strong>Transfer</strong> — mark transfer manifest dispatched<br>" +
+    "⑤c <strong>Supplier RMA</strong> — assemble evidence package, submit to supplier (auto or manual)<br>" +
+    "⑥ <strong>Notify &amp; Close</strong> — send customer notification (SMS + email), close case<br><br>" +
+    "Cases pause at <strong>HITL</strong> (Human-in-the-Loop) whenever a guardrail is violated or manual judgment is required."
+  ),
+  "what are the guardrails": (
+    "🛡️ <strong>Guardrails</strong><br>" +
+    "• <strong>30-day return window</strong> — purchases older than 30 days → HITL for change-of-mind returns.<br>" +
+    "• <strong>Unworn check</strong> — worn items (is_worn=True) → HITL for supervisor review.<br>" +
+    "• <strong>Refund cap €150</strong> — refunds over €150 → HITL for manual authorization.<br>" +
+    "• <strong>Photo quality gate</strong> — defect assessment needs ≥3 clear images from 5 angles. Insufficient photos → re-capture loop.<br>" +
+    "• <strong>Defect confidence threshold 0.85</strong> — below 0.85 → HITL for Anouk manual inspection.<br>" +
+    "• <strong>Atomic hold TTL 48h</strong> — expired holds → dead-letter.<br>" +
+    "• <strong>Defect precedence</strong> — if defect suspected, policy checks are bypassed and case goes to defect path."
+  ),
+  "what is the pipeline": (
+    "💬 <strong>Version A — Single Orchestrator Returns Pipeline</strong><br>" +
+    "A single orchestrator runs a 6-node state machine over a shared <code>ReturnCaseState</code>. " +
+    "All 4 Randstad stores + e-comm are covered. Handles refunds, exchanges (with inter-store stock transfer), " +
+    "defect remedy (with supplier RMA), and HITL pauses."
+  ),
+  "who are the stores": (
+    "🏪 <strong>Stores in the pipeline</strong><br>" +
+    "• Sallie se Schoenen — Utrecht (STORE-Utrecht)<br>" +
+    "• Sallie se Schoenen — Rotterdam (STORE-Rotterdam)<br>" +
+    "• Sallie se Schoenen — Amsterdam (STORE-Amsterdam)<br>" +
+    "• Sallie se Schoenen — Haarlem (STORE-Haarlem)<br>" +
+    "• Sallie se Schoenen — Online (STORE-Ecommerce)"
+  ),
+  "default": (
+    "🤔 I'm not sure I understand. Try one of these:<br>" +
+    "• <code>show case V1</code> — see full case state<br>" +
+    "• <code>list open cases</code> — see all open cases<br>" +
+    "• <code>show HITL queue</code> — see pending supervisor cases<br>" +
+    "• <code>how does the pipeline work</code> — overview<br>" +
+    "• <code>what are the guardrails</code> — all guardrails<br>" +
+    "• <code>which stores have stock of SS-0087</code> — inventory query"
+  )
+};
+
+const clientSessionStates = {};
+const clientHitlStore = {};
+
+function formatClientAuditHtml(auditLog) {
+  if (!auditLog || auditLog.length === 0) return '<div style="color:var(--muted);font-size:12px;padding:4px 0;">No audit entries.</div>';
+  return '<div style="font-size:12px;">' + auditLog.map(e => `
+    <div style="border:1px solid #d2ded7; border-radius:6px; padding:6px 9px; margin-bottom:5px; background:#ffffff;">
+      <div style="font-size:11px; font-weight:600; color:var(--accent2); margin-bottom:2px;">
+        ${e.node_name}${e.next_node ? ' → <code>' + e.next_node + '</code>' : ''}
+      </div>
+      <div style="font-size:11.5px; color:var(--text); margin-bottom:3px; line-height:1.45;">
+        <strong>Decision:</strong> ${e.decision}
+      </div>
+      ${e.output_summary ? '<div style="font-size:11px; color:var(--muted); line-height:1.5; border-top:1px solid #eee; padding-top:3px;">' + e.output_summary + '</div>' : ''}
+      ${e.note ? '<div style="font-size:11px; color:var(--hitl); margin-top:2px;">! ' + e.note + '</div>' : ''}
+    </div>`).join('') + '</div>';
+}
+
+function buildClientNodeVis(state) {
+  const nodes = [
+    ["intake_eval", "① Intake & Condition"],
+    ["cross_store_lookup", "② Cross-Store Proof"],
+    ["policy_check", "③ Policy Check"],
+    ["stock_resolve", "④a Stock & Logistics"],
+    ["defect_assess", "④b Defect Assess"],
+    ["execute_till_refund", "⑤a Till Refund"],
+    ["transfer_dispatcher", "⑤b Transfer"],
+    ["assemble_supplier_rma", "⑤c Supplier RMA"],
+    ["notify_customer", "⑥ Notify & Close"],
+  ];
+  const auditNodes = new Set((state.audit_log || []).map(e => e.node_name));
+  const vis = [];
+  for (const [nodeName, display] of nodes) {
+    vis.push({ name: display, status: auditNodes.has(nodeName) ? 'run' : 'skip' });
+  }
+  if (state.escalated_to_supervisor) vis.push({ name: '⏸ HITL — Supervisor', status: 'hitl' });
+  if (state.closed) vis.push({ name: '✓ Case Closed', status: 'close' });
+  return vis;
+}
+
+function runPipelineSim(cfg) {
+  const sku = cfg.sku || "SS-0042";
+  const caseId = cfg.caseId || `RC-PREV-${Math.floor(1000 + Math.random() * 9000)}`;
+  const storeId = cfg.storeId || "STORE-Utrecht";
+  const storeName = cfg.storeName || STORE_NAMES[storeId] || "Sallie se Schoenen";
+  const customerId = cfg.customerId || "CUST-PREVIEW-001";
+  const email = cfg.email || "preview@demo.nl";
+  const phone = cfg.phone || "+31612345678";
+  const price = typeof cfg.price === 'number' ? cfg.price : (parseFloat(cfg.price) || 89.95);
+  const isWorn = cfg.isWornHint === true;
+  const packagingIntact = cfg.packagingHint !== false;
+  const receiptId = cfg.receiptId || "";
+  const imageUrls = cfg.imageUrls && cfg.imageUrls.length > 0 ? cfg.imageUrls : [`${sku.toLowerCase()}_top.jpg`, `${sku.toLowerCase()}_side.jpg`, `${sku.toLowerCase()}_sole.jpg`];
+  let preferredResolution = cfg.resolution || "";
+
+  const state = {
+    case_id: caseId,
+    customer_id: customerId,
+    customer_email: email,
+    customer_phone: phone,
+    origin_store_id: storeId,
+    origin_store_name: storeName,
+    intake_timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+    purchase_date: null,
+    receipt_id: receiptId,
+    proof_verified: false,
+    receipt_verification: null,
+    condition_verdict: null,
+    policy_result: null,
+    resolution_type: preferredResolution || null,
+    resolution_amount_eur: "0.00",
+    escalation_reason: null,
+    escalation_reason_detail: null,
+    items: [{
+      sku: sku,
+      size: cfg.size || "EU-39",
+      condition_description: cfg.conditionDesc || `Customer return — ${sku}`,
+      image_urls: imageUrls,
+      imageUrls: imageUrls,
+      is_worn: isWorn,
+      packaging_intact: packagingIntact,
+      purchase_price_eur: price.toFixed(2)
+    }],
+    stock_matrix: null,
+    hold_reservation: null,
+    transfer_manifest: null,
+    alternative_offer_made: false,
+    alternative_offer_details: null,
+    defect_detected: false,
+    supplier_claim: null,
+    rma_evidence_package_ref: null,
+    escalated_to_supervisor: false,
+    escalation_timestamp: null,
+    supervisor_notes: null,
+    supervisor_resolved_at: null,
+    customer_notification_status: "NOT_SENT",
+    notification_channels: [],
+    notified_at: null,
+    notification_message_ref: null,
+    dead_letter_reason: "NONE",
+    dead_letter_timestamp: null,
+    closed: false,
+    closed_at: null,
+    audit_log: []
+  };
+
+  function logDec(node, decision, summary, nextNode, note) {
+    state.audit_log.push({
+      node_name: node,
+      decision: decision,
+      output_summary: summary || "",
+      next_node: nextNode || null,
+      note: note || null,
+      timestamp: new Date().toUTCString()
+    });
+  }
+
+  // Node 1: Intake & Condition
+  let daysSince = 7;
+  let receiptFound = false;
+  if (receiptId && MOCK_RECEIPTS[receiptId]) {
+    const rc = MOCK_RECEIPTS[receiptId];
+    receiptFound = true;
+    state.proof_verified = true;
+    daysSince = rc.daysAgo;
+    state.receipt_verification = {
+      receipt_id: rc.receiptId,
+      valid: true,
+      days_since_purchase: rc.daysAgo,
+      store_id: rc.storeId,
+      store_name: rc.storeName,
+      transaction_amount_eur: rc.amount,
+      payment_method: rc.payment,
+      purchase_date: `2026-10-${Math.max(1, 30 - rc.daysAgo)}`,
+      verification_method: "receipt_scanned"
+    };
+    state.purchase_date = state.receipt_verification.purchase_date;
+  } else if (receiptId) {
+    state.proof_verified = false;
+  }
+
+  const isDefectiveSku = sku === "SS-0091";
+  const photoQualityPassed = imageUrls.length >= 3;
+  state.condition_verdict = {
+    condition_status: isDefectiveSku ? "DEFECTIVE" : (isWorn ? "LIGHT_WEAR" : "UNWORN"),
+    is_worn: isWorn,
+    packaging_intact: packagingIntact,
+    wear_evidence: isDefectiveSku ? ["Sole separation at heel joint"] : (isWorn ? ["Minor sole scuffing"] : []),
+    defect_suspected: isDefectiveSku,
+    defect_confidence: isDefectiveSku ? 0.91 : 0.78,
+    is_manufacturing_fault: isDefectiveSku,
+    fault_type: isDefectiveSku ? "SOLE_DETACHMENT" : null,
+    photo_quality_passed: photoQualityPassed,
+    missing_angles: photoQualityPassed ? [] : ["sole", "heel"],
+    cv_model_version: "mock-cv-v1"
+  };
+
+  logDec("intake_eval", `Condition: ${state.condition_verdict.condition_status} | Proof: ${state.proof_verified ? 'OK' : 'MISSING'}`,
+    `condition_status=${state.condition_verdict.condition_status}, is_worn=${isWorn}, defect_suspected=${isDefectiveSku}, conf=${state.condition_verdict.defect_confidence}, quality_passed=${photoQualityPassed}`,
+    state.proof_verified ? "policy_check" : "cross_store_lookup"
+  );
+
+  // Node 2: Cross Store Lookup (if needed)
+  if (!state.proof_verified) {
+    let matchedTxn = null;
+    for (const [rid, r] of Object.entries(MOCK_RECEIPTS)) {
+      if ((email && r.email.toLowerCase() === email.toLowerCase()) || (customerId && r.customer === customerId) || (phone && r.phone === phone)) {
+        matchedTxn = r;
+        break;
+      }
+    }
+    if (matchedTxn) {
+      state.proof_verified = true;
+      daysSince = matchedTxn.daysAgo;
+      state.receipt_verification = {
+        receipt_id: matchedTxn.receiptId,
+        valid: true,
+        days_since_purchase: matchedTxn.daysAgo,
+        store_id: matchedTxn.storeId,
+        store_name: matchedTxn.storeName,
+        transaction_amount_eur: matchedTxn.amount,
+        payment_method: matchedTxn.payment,
+        purchase_date: `2026-10-${Math.max(1, 30 - matchedTxn.daysAgo)}`,
+        verification_method: "federated_sales_search"
+      };
+      state.purchase_date = state.receipt_verification.purchase_date;
+      logDec("cross_store_lookup", `Proof located: ${matchedTxn.receiptId} at ${matchedTxn.storeName}`,
+        `days=${matchedTxn.daysAgo}, amount=${matchedTxn.amount}, method=federated_sales_search`, "policy_check");
+    } else {
+      state.escalated_to_supervisor = true;
+      state.escalation_timestamp = new Date().toISOString();
+      state.escalation_reason = "No purchase record found across 4 stores + e-comm. Supervisor verification required.";
+      state.escalation_reason_detail = state.escalation_reason;
+      logDec("cross_store_lookup", "PROOF_NOT_FOUND — HITL (Anouk manual review)",
+        "No matching transaction in federated ledger. Anouk reviews bank slip or manual proof.", "HITL",
+        "Paused for Anouk review.");
+      clientSessionStates[state.case_id] = state;
+      clientHitlStore[state.case_id] = state;
+      return {
+        state: state,
+        nodeVis: buildClientNodeVis(state),
+        auditLog: state.audit_log,
+        hitlCaseId: state.case_id,
+        message: `Case ${state.case_id}: HITL paused at cross_store_lookup`
+      };
+    }
+  }
+
+  // Node 3: Policy Check
+  const within30d = daysSince <= 30;
+  const underCap = price <= 150.0;
+  state.policy_result = {
+    within_30_day_window: within30d,
+    is_unworn: !isWorn,
+    refund_amount_eur: price.toFixed(2),
+    under_refund_cap: underCap,
+    escalation_reason: null,
+    resolution_type: isDefectiveSku ? "DEFECT_REMEDY" : (preferredResolution || "REFUND")
+  };
+
+  if (isDefectiveSku) {
+    state.defect_detected = true;
+    state.resolution_type = "DEFECT_REMEDY";
+    logDec("policy_check", "Defect suspected — routing to defect_assess (bypasses change-of-mind policy)",
+      `defect_detected=True, conf=0.91, fault=SOLE_DETACHMENT`, "defect_assess");
+  } else if (!within30d && isWorn) {
+    state.escalated_to_supervisor = true;
+    state.escalation_timestamp = new Date().toISOString();
+    state.escalation_reason = `Change-of-mind return refused: item worn, ${daysSince} days since purchase (30-day policy).`;
+    state.escalation_reason_detail = state.escalation_reason;
+    logDec("policy_check", "OUT_OF_POLICY: worn + out of 30-day window → HITL",
+      `days=${daysSince}, is_worn=True → supervisor review`, "HITL");
+    clientSessionStates[state.case_id] = state;
+    clientHitlStore[state.case_id] = state;
+    return {
+      state: state,
+      nodeVis: buildClientNodeVis(state),
+      auditLog: state.audit_log,
+      hitlCaseId: state.case_id,
+      message: `Case ${state.case_id}: HITL paused at policy_check`
+    };
+  } else if (!within30d) {
+    state.escalated_to_supervisor = true;
+    state.escalation_timestamp = new Date().toISOString();
+    state.escalation_reason = `Change-of-mind return outside 30-day window: ${daysSince} days. Requires supervisor policy exception.`;
+    state.escalation_reason_detail = state.escalation_reason;
+    logDec("policy_check", "OUT_OF_WINDOW: >30 days → HITL", `days=${daysSince} → supervisor review`, "HITL");
+    clientSessionStates[state.case_id] = state;
+    clientHitlStore[state.case_id] = state;
+    return {
+      state: state,
+      nodeVis: buildClientNodeVis(state),
+      auditLog: state.audit_log,
+      hitlCaseId: state.case_id,
+      message: `Case ${state.case_id}: HITL paused at policy_check`
+    };
+  } else if (isWorn) {
+    state.escalated_to_supervisor = true;
+    state.escalation_timestamp = new Date().toISOString();
+    state.escalation_reason = "Item shows wear — change-of-mind return refused per policy. Supervisor review.";
+    state.escalation_reason_detail = state.escalation_reason;
+    logDec("policy_check", "ITEM_WORN: is_worn=True → HITL", "Shows wear → supervisor review", "HITL");
+    clientSessionStates[state.case_id] = state;
+    clientHitlStore[state.case_id] = state;
+    return {
+      state: state,
+      nodeVis: buildClientNodeVis(state),
+      auditLog: state.audit_log,
+      hitlCaseId: state.case_id,
+      message: `Case ${state.case_id}: HITL paused at policy_check`
+    };
+  } else if (preferredResolution === "EXCHANGE") {
+    state.resolution_type = "EXCHANGE";
+    logDec("policy_check", "Policy passed — routing to stock_resolve for exchange",
+      `within_30d=True, is_worn=False → stock_resolve`, "stock_resolve");
+  } else {
+    state.resolution_type = "REFUND";
+    logDec("policy_check", `Policy passed — within_30d=True, unworn=True, cap_ok=${underCap} → REFUND`,
+      `days=${daysSince}, is_worn=False, refund_amount=${price.toFixed(2)} → execute_till_refund`, "execute_till_refund");
+  }
+
+  // Node 4a: Stock Resolve
+  if (state.resolution_type === "EXCHANGE") {
+    const inv = MOCK_INVENTORY[sku] || { "STORE-Utrecht": 0, "STORE-Rotterdam": 2, "STORE-Amsterdam": 0, "STORE-Haarlem": 0, "WAREHOUSE": 2 };
+    const items = Object.entries(inv).map(([sid, qty]) => ({
+      store_id: sid,
+      store_name: STORE_NAMES[sid] || sid,
+      quantity_available: qty,
+      is_verified: true
+    }));
+    const totalAvail = items.reduce((sum, i) => sum + i.quantity_available, 0);
+    const localQty = inv[storeId] || 0;
+    state.stock_matrix = {
+      sku: sku,
+      size: cfg.size || "EU-39",
+      total_available: totalAvail,
+      has_local_stock: localQty > 0,
+      has_network_stock: totalAvail > localQty,
+      items: items
+    };
+
+    if (localQty > 0) {
+      logDec("stock_resolve", `Local stock available at ${storeName} (${localQty} pairs) — immediate handover`,
+        `Origin store has stock → notify customer`, "notify_customer");
+    } else if (state.stock_matrix.has_network_stock) {
+      // Find remote store with stock
+      const remote = items.find(i => i.store_id !== storeId && i.quantity_available > 0) || items[0];
+      const holdId = `HLD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      state.hold_reservation = {
+        hold_id: holdId,
+        sku: sku,
+        size: cfg.size || "EU-39",
+        store_id: remote.store_id,
+        store_name: remote.store_name,
+        quantity: 1,
+        ttl_seconds: 172800,
+        acquired_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 172800000).toISOString().replace('T', ' ').substring(0, 16),
+        status: "ACTIVE"
+      };
+      const manifestId = `XFER-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      state.transfer_manifest = {
+        manifest_id: manifestId,
+        origin_store_id: remote.store_id,
+        origin_store_name: remote.store_name,
+        dest_store_id: storeId,
+        dest_store_name: storeName,
+        sku: sku,
+        size: cfg.size || "EU-39",
+        quantity: 1,
+        hold_id: holdId,
+        status: "DISPATCHED",
+        scheduled_collection_date: new Date(Date.now() + 14400000).toISOString().replace('T', ' ').substring(0, 16),
+        created_at: new Date().toISOString()
+      };
+      logDec("stock_resolve", `Atomic hold acquired: ${holdId} at ${remote.store_name} — manifest created`,
+        `origin=${remote.store_name}, dest=${storeName}, hold_ttl=48h`, "transfer_dispatcher");
+      logDec("transfer_dispatcher", `Transfer manifest ${manifestId} dispatched to ${storeName}`,
+        `manifest_id=${manifestId}, origin=${remote.store_name}, dest=${storeName}, ETA=4h`, "notify_customer");
+    } else {
+      state.alternative_offer_made = true;
+      state.alternative_offer_details = "No stock available across 4 stores or central warehouse. Offered store credit or alternative model.";
+      logDec("stock_resolve", "No network stock — alternative offer generated",
+        "Offered store credit or alternative model", "notify_customer");
+    }
+  }
+
+  // Node 4b: Defect Assess
+  if (state.resolution_type === "DEFECT_REMEDY") {
+    if (!photoQualityPassed) {
+      state.escalated_to_supervisor = true;
+      state.escalation_timestamp = new Date().toISOString();
+      state.escalation_reason = "Defect claim submitted with insufficient photo quality. Missing angles: sole, heel. Re-capture required.";
+      state.escalation_reason_detail = state.escalation_reason;
+      logDec("defect_assess", "PHOTO_QUALITY_FAIL — re-capture loop required",
+        "Missing required angles: sole, heel", "HITL", "Pause for re-capture prompt at till.");
+      clientSessionStates[state.case_id] = state;
+      clientHitlStore[state.case_id] = state;
+      return {
+        state: state,
+        nodeVis: buildClientNodeVis(state),
+        auditLog: state.audit_log,
+        hitlCaseId: state.case_id,
+        message: `Case ${state.case_id}: HITL paused at defect_assess`
+      };
+    }
+    const evidenceRef = `EVIDENCE-${state.case_id}-${sku}`;
+    state.rma_evidence_package_ref = evidenceRef;
+    const rmaNum = `RMA-PLT-${Math.floor(10000 + Math.random() * 90000)}`;
+    state.supplier_claim = {
+      claim_id: rmaNum,
+      supplier_id: "SUP-PLETE-001",
+      supplier_name: "Prete Footwear B.V.",
+      rma_number: rmaNum,
+      status: "SUBMITTED",
+      evidence_package_ref: evidenceRef,
+      submitted_at: new Date().toISOString(),
+      approved_at: null,
+      credit_eur: price.toFixed(2)
+    };
+    logDec("defect_assess", `Defect confirmed — conf=0.91 ≥ 0.85 — remedy authorized`,
+      "fault_type=SOLE_DETACHMENT, confidence=0.91, is_manufacturing_fault=True", "assemble_supplier_rma");
+    logDec("assemble_supplier_rma", `Supplier RMA submitted to Prete Footwear: ${rmaNum}`,
+      `claim_id=${rmaNum}, supplier=Prete Footwear B.V., evidence_ref=${evidenceRef}`, "notify_customer");
+  }
+
+  // Node 5a: Till Refund
+  if (state.resolution_type === "REFUND") {
+    if (price > 150.0) {
+      state.escalated_to_supervisor = true;
+      state.escalation_timestamp = new Date().toISOString();
+      state.escalation_reason = `Refund amount €${price.toFixed(2)} exceeds auto-approval cap of €150.00 — requires supervisor digital authorization.`;
+      state.escalation_reason_detail = state.escalation_reason;
+      logDec("execute_till_refund", `Refund cap exceeded: ${price.toFixed(2)} > €150.00 — HITL required`,
+        `amount=${price.toFixed(2)}, cap=150.00`, "HITL", "Anouk reviews and digitally authorizes higher-value refund.");
+      clientSessionStates[state.case_id] = state;
+      clientHitlStore[state.case_id] = state;
+      return {
+        state: state,
+        nodeVis: buildClientNodeVis(state),
+        auditLog: state.audit_log,
+        hitlCaseId: state.case_id,
+        message: `Case ${state.case_id}: HITL paused at execute_till_refund`
+      };
+    }
+    state.resolution_amount_eur = price.toFixed(2);
+    logDec("execute_till_refund", `Refund authorized: ${price.toFixed(2)} EUR — authorized by agent`,
+      `amount=${price.toFixed(2)}, cap=150.00, authorized_by=agent`, "notify_customer");
+  }
+
+  // Node 6: Notify Customer & Close
+  state.customer_notification_status = "SENT";
+  state.notification_channels = ["sms", "email"];
+  state.notified_at = new Date().toISOString();
+  state.closed = true;
+  state.closed_at = new Date().toISOString();
+  let notifType = "refund_confirmed";
+  if (state.resolution_type === "EXCHANGE") notifType = "exchange_ticket";
+  if (state.resolution_type === "DEFECT_REMEDY") notifType = "defect_remedy";
+  logDec("notify_customer", `Customer notified: ${notifType} via ['sms', 'email']`,
+    `case_id=${state.case_id}, type=${notifType}, channels=['sms', 'email'], delivered=True`, "CLOSE",
+    "Case closed — customer notified.");
+
+  clientSessionStates[state.case_id] = state;
+  delete clientHitlStore[state.case_id];
+  return {
+    state: state,
+    nodeVis: buildClientNodeVis(state),
+    auditLog: state.audit_log,
+    hitlCaseId: null,
+    message: `Case ${state.case_id}: ${state.resolution_type} resolved`
+  };
+}
+
+function resumeHitLSim(caseId, action, notes) {
+  let state = clientHitlStore[caseId] || clientSessionStates[caseId];
+  if (!state) {
+    return { error: `Case ${caseId} not found` };
+  }
+  state.supervisor_notes = notes || `Supervisor action: ${action}`;
+  state.supervisor_resolved_at = new Date().toISOString();
+  state.escalated_to_supervisor = false;
+
+  function logDec(node, decision, summary, nextNode, note) {
+    state.audit_log.push({
+      node_name: node,
+      decision: decision,
+      output_summary: summary || "",
+      next_node: nextNode || null,
+      note: note || null,
+      timestamp: new Date().toUTCString()
+    });
+  }
+
+  if (action === "APPROVE_REFUND") {
+    state.resolution_type = "REFUND";
+    const price = parseFloat(state.items[0]?.purchase_price_eur || "89.95");
+    state.resolution_amount_eur = price.toFixed(2);
+    logDec("execute_till_refund", `Refund authorized: ${price.toFixed(2)} EUR — authorized by supervisor override`,
+      `amount=${price.toFixed(2)}, supervisor_override=True, notes="${state.supervisor_notes}"`, "notify_customer");
+    state.customer_notification_status = "SENT";
+    state.notification_channels = ["sms", "email"];
+    state.notified_at = new Date().toISOString();
+    state.closed = true;
+    state.closed_at = new Date().toISOString();
+    logDec("notify_customer", "Customer notified: refund_confirmed via ['sms', 'email']",
+      `case_id=${state.case_id}, delivered=True`, "CLOSE", "Case closed — customer notified.");
+  } else if (action === "REJECT_RETURN") {
+    state.resolution_type = "PENDING_REVIEW";
+    state.escalation_reason = `Supervisor rejected: ${notes || 'Return refused per store policy'}`;
+    state.customer_notification_status = "SENT";
+    state.notification_channels = ["sms", "email"];
+    state.notified_at = new Date().toISOString();
+    state.closed = true;
+    state.closed_at = new Date().toISOString();
+    logDec("notify_customer", "Customer notified: return_rejected via ['sms', 'email']",
+      `case_id=${state.case_id}, rejection_reason="${state.escalation_reason}", delivered=True`, "CLOSE",
+      "Case closed — supervisor rejection issued to customer.");
+  } else if (action === "APPROVE_EXCHANGE") {
+    state.resolution_type = "EXCHANGE";
+    // Acquire hold at Rotterdam
+    const holdId = `HLD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    state.hold_reservation = {
+      hold_id: holdId,
+      sku: state.items[0]?.sku || "SS-0087",
+      size: state.items[0]?.size || "EU-42",
+      store_id: "STORE-Rotterdam",
+      store_name: "Sallie se Schoenen — Rotterdam",
+      quantity: 1,
+      ttl_seconds: 172800,
+      acquired_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 172800000).toISOString().replace('T', ' ').substring(0, 16),
+      status: "ACTIVE"
+    };
+    const manifestId = `XFER-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    state.transfer_manifest = {
+      manifest_id: manifestId,
+      origin_store_id: "STORE-Rotterdam",
+      origin_store_name: "Sallie se Schoenen — Rotterdam",
+      dest_store_id: state.origin_store_id,
+      dest_store_name: state.origin_store_name,
+      sku: state.items[0]?.sku || "SS-0087",
+      size: state.items[0]?.size || "EU-42",
+      quantity: 1,
+      hold_id: holdId,
+      status: "DISPATCHED",
+      scheduled_collection_date: new Date(Date.now() + 14400000).toISOString().replace('T', ' ').substring(0, 16),
+      created_at: new Date().toISOString()
+    };
+    logDec("stock_resolve", `Supervisor authorized exchange — atomic hold ${holdId} created at Rotterdam`,
+      `dest=${state.origin_store_name}, hold_ttl=48h`, "transfer_dispatcher");
+    logDec("transfer_dispatcher", `Transfer manifest ${manifestId} dispatched`,
+      `ETA=4h, destination=${state.origin_store_name}`, "notify_customer");
+    state.customer_notification_status = "SENT";
+    state.notification_channels = ["sms", "email"];
+    state.notified_at = new Date().toISOString();
+    state.closed = true;
+    state.closed_at = new Date().toISOString();
+    logDec("notify_customer", "Customer notified: exchange_ticket via ['sms', 'email']",
+      `case_id=${state.case_id}, manifest_id=${manifestId}, delivered=True`, "CLOSE", "Case closed — exchange ticket sent.");
+  } else if (action === "FLAG_DEFECT_MANUAL" || action === "ESCALATE_PURCHASING") {
+    state.defect_detected = true;
+    state.resolution_type = "DEFECT_REMEDY";
+    const sku = state.items[0]?.sku || "SS-0091";
+    const evidenceRef = `EVIDENCE-${state.case_id}-${sku}`;
+    state.rma_evidence_package_ref = evidenceRef;
+    const rmaNum = `RMA-PLT-${Math.floor(10000 + Math.random() * 90000)}`;
+    state.supplier_claim = {
+      claim_id: rmaNum,
+      supplier_id: "SUP-PLETE-001",
+      supplier_name: "Prete Footwear B.V.",
+      rma_number: rmaNum,
+      status: "SUBMITTED",
+      evidence_package_ref: evidenceRef,
+      submitted_at: new Date().toISOString(),
+      approved_at: null,
+      credit_eur: state.items[0]?.purchase_price_eur || "119.50"
+    };
+    logDec("defect_assess", "Supervisor confirmed physical defect — manual remedy authorized",
+      `manual_inspection=True, evidence_ref=${evidenceRef}`, "assemble_supplier_rma");
+    logDec("assemble_supplier_rma", `Supplier RMA submitted: ${rmaNum}`,
+      `claim_id=${rmaNum}, supplier=Prete Footwear B.V.`, "notify_customer");
+    state.customer_notification_status = "SENT";
+    state.notification_channels = ["sms", "email"];
+    state.notified_at = new Date().toISOString();
+    state.closed = true;
+    state.closed_at = new Date().toISOString();
+    logDec("notify_customer", "Customer notified: defect_remedy via ['sms', 'email']",
+      `case_id=${state.case_id}, delivered=True`, "CLOSE", "Case closed — defect remedy confirmed.");
+  }
+
+  delete clientHitlStore[caseId];
+  clientSessionStates[state.case_id] = state;
+  return {
+    state: state,
+    nodeVis: buildClientNodeVis(state),
+    auditLog: state.audit_log,
+    hitlCaseId: null,
+    message: `Case ${state.case_id}: ${state.resolution_type} resolved by supervisor`
+  };
+}
+
+function seedClientDemoCases() {
+  // Case 1: Standard refund (closed)
+  const c1 = runPipelineSim({ caseId: "RC-CASE-001", sku: "SS-0042", size: "EU-39", price: 89.95, receiptId: "REC-883921", storeId: "STORE-Utrecht", customerId: "CUST-MARIEKE-DJ", email: "marieke.dejong@mail.nl", resolution: "REFUND" });
+  clientSessionStates["V1"] = c1.state;
+  clientSessionStates["RC-CASE-001"] = c1.state;
+
+  // Case 2: Exchange with transfer (closed)
+  const c2 = runPipelineSim({ caseId: "RC-CASE-002", sku: "SS-0087", size: "EU-42", price: 135.00, receiptId: "", storeId: "STORE-Amsterdam", customerId: "CUST-DAAN-B", email: "daan.bakker@email.nl", resolution: "EXCHANGE" });
+  clientSessionStates["V2"] = c2.state;
+  clientSessionStates["RC-CASE-002"] = c2.state;
+
+  // Case 3: Missing receipt -> HITL pause (open in HITL queue)
+  const c3 = runPipelineSim({ caseId: "RC-CASE-003", sku: "SS-0033", size: "EU-38", price: 64.50, receiptId: "", storeId: "STORE-Utrecht", customerId: "CUST-UNKNOWN", email: "unknown@customer.nl", resolution: "REFUND" });
+  clientSessionStates["V3"] = c3.state;
+  clientSessionStates["RC-CASE-003"] = c3.state;
+  clientHitlStore["V3"] = c3.state;
+  clientHitlStore["RC-CASE-003"] = c3.state;
+
+  // Case 4: Defect case (closed)
+  const c4 = runPipelineSim({ caseId: "RC-CASE-004", sku: "SS-0091", size: "EU-41", price: 119.50, receiptId: "REC-661098", storeId: "STORE-Haarlem", customerId: "CUST-SOFIE-VD", email: "sofie.vandijk@kpnmail.nl", resolution: "" });
+  clientSessionStates["V4"] = c4.state;
+  clientSessionStates["RC-CASE-004"] = c4.state;
+
+  // Case 5: Worn out of window (closed after supervisor rejection)
+  const c5 = runPipelineSim({ caseId: "RC-CASE-005", sku: "SS-0055", size: "EU-44", price: 69.00, receiptId: "REC-000555", isWornHint: true, storeId: "STORE-Rotterdam", customerId: "CUST-JAN-K", email: "jan.koster@webmail.nl", resolution: "" });
+  const c5_resolved = resumeHitLSim(c5.state.case_id, "REJECT_RETURN", "Supervisor reviewed and rejected out-of-policy return.");
+  clientSessionStates["V5"] = c5_resolved.state;
+  clientSessionStates["RC-CASE-005"] = c5_resolved.state;
+}
+
+seedClientDemoCases();
+
+function chatSim(rawMessage) {
+  const message = (rawMessage || "").trim().toLowerCase();
+  if (!message) return { body: "Please type a message." };
+
+  // Case search
+  const caseIdMatch = rawMessage.match(/(?:show|check|visit|get|what happened in|details for)\s+(?:case\s+)?([a-zA-Z0-9][a-zA-Z0-9_-]*)/i) || rawMessage.match(/case\s+([a-zA-Z0-9][a-zA-Z0-9_-]*)/i);
+  if (caseIdMatch) {
+    const cid = caseIdMatch[1].toUpperCase();
+    const state = clientSessionStates[cid] || clientHitlStore[cid];
+    if (state) {
+      return {
+        body: `📋 <strong>Case: ${state.case_id}</strong>`,
+        stateJson: state,
+        auditHtml: formatClientAuditHtml(state.audit_log),
+        label: `Case ${state.case_id}`
+      };
+    }
+  }
+
+  // Open cases
+  if (message.includes("list open") || message.includes("open cases") || message.includes("all cases")) {
+    const openCases = Object.entries(clientSessionStates)
+      .filter(([k, s]) => !s.closed && !k.startsWith("V"))
+      .map(([k, s]) => ({ caseId: k, state: s }));
+    if (openCases.length === 0) return { body: "No open cases in this session. All cases have been resolved." };
+    let html = `<div style="margin-top:8px;"><div style="font-size:13px; font-weight:600; color:var(--accent2); margin-bottom:6px;">Open Cases (${openCases.length})</div>`;
+    for (const c of openCases) {
+      html += `<div style="background:#f0f4f8; border:1px solid var(--line); border-radius:6px; padding:8px 12px; margin-bottom:6px;">
+        <code style="color:var(--accent2); font-size:13px;">${c.caseId}</code> — <span style="font-size:12px; color:var(--muted);">${c.state.origin_store_name} · ${c.state.customer_email}</span>
+        <span style="float:right; font-size:11px; color:var(--warm); font-weight:600;">OPEN (HITL)</span>
+      </div>`;
+    }
+    html += '</div>';
+    return { body: html };
+  }
+
+  // HITL Queue
+  if (message.includes("hitl") && (message.includes("queue") || message.includes("pending") || message.includes("supervisor"))) {
+    const queue = Object.entries(clientHitlStore).filter(([k]) => !k.startsWith("V")).map(([k, s]) => s);
+    if (queue.length === 0) return { body: "No cases in HITL queue." };
+    let html = `<div style="margin-top:8px;"><div style="font-size:13px; font-weight:600; color:var(--hitl); margin-bottom:8px;">🚨 HITL Queue — Supervisor Action Required (${queue.length})</div>`;
+    for (const s of queue) {
+      html += `<div style="background:#f5eef8; border:1px solid #7d3c98; border-left:4px solid #7d3c98; border-radius:6px; padding:8px 12px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <code style="color:var(--hitl); font-size:13px; font-weight:600;">${s.case_id}</code>
+          <span style="font-size:11px; color:var(--muted);">${s.resolution_type || 'PENDING_REVIEW'}</span>
+        </div>
+        <div style="font-size:12px; color:var(--text); margin-top:4px;">
+          <strong>Store:</strong> ${s.origin_store_name}<br>
+          <strong>Customer:</strong> ${s.customer_email}<br>
+          <strong>Reason:</strong> ${s.escalation_reason || 'Supervisor review required'}
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+    return { body: html, tab: "hitl" };
+  }
+
+  // Total stats
+  if (message.includes("total") && (message.includes("case") || message.includes("run"))) {
+    const uniqueCases = Object.entries(clientSessionStates).filter(([k]) => !k.startsWith("V")).map(([k, s]) => s);
+    const totalRun = uniqueCases.length;
+    const totalClosed = uniqueCases.filter(s => s.closed).length;
+    const totalHitl = Object.entries(clientHitlStore).filter(([k]) => !k.startsWith("V")).length;
+    return {
+      body: `📊 <strong>Session Statistics</strong><br>• Total cases run: <strong>${totalRun}</strong><br>• Cases closed: <strong>${totalClosed}</strong><br>• Cases in HITL: <strong>${totalHitl}</strong>`
+    };
+  }
+
+  // Stock inventory lookup
+  const stockMatch = rawMessage.match(/(?:which|what|get|show|list).*?(?:stock|inventory|available)\s+(?:of\s+|for\s+)?([a-zA-Z0-9][a-zA-Z0-9_-]*)/i) || rawMessage.match(/([a-zA-Z0-9][a-zA-Z0-9_-]*)\s+(?:stock|inventory|available)/i);
+  if (stockMatch) {
+    const sku = stockMatch[1].toUpperCase();
+    const stores = MOCK_INVENTORY[sku];
+    if (!stores) return { body: `❌ No stock data for SKU <code>${sku}</code> in mock inventory.` };
+    const total = Object.values(stores).reduce((a, b) => a + b, 0);
+    let html = `<div style="margin-top:8px;"><div style="font-size:13px; font-weight:600; color:var(--accent2); margin-bottom:6px;">📦 Stock for <code>${sku}</code></div><div style="font-size:12px; color:var(--muted); margin-bottom:8px;">Total: <strong>${total} pairs</strong></div><table style="width:100%; border-collapse:collapse; font-size:12.5px;"><tr style="background:#eef2f7;"><th style="padding:4px 8px; text-align:left; color:var(--muted);">Store</th><th style="padding:4px 8px; text-align:right; color:var(--muted);">Qty</th></tr>`;
+    for (const [sid, qty] of Object.entries(stores)) {
+      html += `<tr style="border-bottom:1px solid var(--line);"><td style="padding:3px 8px;">${STORE_NAMES[sid] || sid}</td><td style="padding:3px 8px; text-align:right; font-weight:600;">${qty}</td></tr>`;
+    }
+    html += '</table></div>';
+    return { body: html };
+  }
+
+  // Knowledge base
+  for (const [key, answer] of Object.entries(CHAT_KNOWLEDGE)) {
+    if (message.includes(key)) return { body: answer };
+  }
+  if (message.includes("pipeline") && (message.includes("what") || message.includes("how") || message.includes("explain"))) {
+    return { body: CHAT_KNOWLEDGE["what is the pipeline"] };
+  }
+  if (message.includes("store") && (message.includes("which") || message.includes("what"))) {
+    return { body: CHAT_KNOWLEDGE["who are the stores"] };
+  }
+
+  return { body: CHAT_KNOWLEDGE["default"] };
+}
+
+
+
+// ── State ────────────────────────────────────────────────────────────────────
+let currentCase = null;   // ReturnCaseState (serialised)
+let hitlCaseId = null;    // case_id paused at HITL
+let history = [];         // array of {case_id, resolution, summary}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('.tab[onclick*="' + name + '"]').classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'hitl') refreshHitL();
+  if (name === 'history') renderHistory();
+}
+
+// ── Config helpers ─────────────────────────────────────────────────────────────
+function getConfig() {
+  const storeSelect = document.getElementById('cfg-store');
+  const storeName = (storeSelect.selectedOptions && storeSelect.selectedOptions[0])
+    ? storeSelect.selectedOptions[0].textContent
+    : (storeSelect.value || 'Sallie se Schoenen — Utrecht');
+  return {
+    caseId: document.getElementById('cfg-case-id').value || '',
+    storeId: storeSelect.value,
+    storeName: storeName,
+    customerId: document.getElementById('cfg-customer-id').value || 'CUST-PREVIEW-001',
+    email: document.getElementById('cfg-email').value || 'preview@demo.nl',
+    phone: document.getElementById('cfg-phone').value || '',
+    resolution: document.getElementById('cfg-resolution').value || '',
+    sku: document.getElementById('cfg-sku').value || 'SS-0042',
+    size: document.getElementById('cfg-size').value || 'EU-39',
+    price: parseFloat(document.getElementById('cfg-price').value) || 89.95,
+    conditionDesc: document.getElementById('cfg-condition-desc').value || '',
+    isWornHint: document.getElementById('cfg-is-worn').value === 'true' ? true
+                : document.getElementById('cfg-is-worn').value === 'false' ? false : null,
+    packagingHint: document.getElementById('cfg-packaging').value === 'true' ? true
+                   : document.getElementById('cfg-packaging').value === 'false' ? false : null,
+    receiptId: document.getElementById('cfg-receipt-id').value || '',
+    imageUrls: document.getElementById('cfg-images').value
+      .split(',').map(s => s.trim()).filter(s => s.length > 0),
+  };
+}
+
+function resetConfig() {
+  document.getElementById('cfg-case-id').value = '';
+  document.getElementById('cfg-store').value = 'STORE-Utrecht';
+  document.getElementById('cfg-customer-id').value = 'CUST-PREVIEW-001';
+  document.getElementById('cfg-email').value = 'preview@demo.nl';
+  document.getElementById('cfg-phone').value = '+31612345678';
+  document.getElementById('cfg-resolution').value = '';
+  document.getElementById('cfg-sku').value = 'SS-0042';
+  document.getElementById('cfg-size').value = 'EU-39';
+  document.getElementById('cfg-price').value = '89.95';
+  document.getElementById('cfg-condition-desc').value = 'Box opened, shoes clean, no apparent wear';
+  document.getElementById('cfg-is-worn').value = '';
+  document.getElementById('cfg-packaging').value = '';
+  document.getElementById('cfg-receipt-id').value = 'REC-883921';
+  document.getElementById('cfg-images').value = 'shoe_top.jpg, shoe_side.jpg, shoe_sole.jpg';
+}
+
+// ── Build case (Python side) ──────────────────────────────────────────────────
+function buildCase() {
+  const btn = document.querySelector('button[onclick="buildAndRun()"]');
+  if (btn) { btn.textContent = '⏳ Running...'; btn.disabled = true; btn.style.opacity = '0.7'; }
+  const cfg = getConfig();
+
+  const handleSuccess = (data) => {
+    currentCase = data.state;
+    hitlCaseId = data.hitlCaseId || null;
+    showStatus(data.state.closed ? 'closed' : 'case-built', data.message || ('Case — ' + data.state.case_id));
+    showNodeVis(data.nodeVis);
+    renderState(data.state);
+    renderAudit(data.auditLog);
+    document.getElementById('panel-run').classList.add('active');
+    switchTab('run');
+    if (btn) { btn.textContent = '▶ Build Case + Run Full Pipeline'; btn.disabled = false; btn.style.opacity = '1'; }
+  };
+
+  const isStatic = window.location.protocol === 'file:' || window.location.hostname.endsWith('github.io');
+  if (isStatic) {
+    setTimeout(() => {
+      const data = runPipelineSim(cfg);
+      handleSuccess(data);
+    }, 120);
+    return;
+  }
+
+  fetch('/api/build', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cfg),
+  })
+  .then(r => { if (!r.ok) throw new Error('API ' + r.status); return r.json(); })
+  .then(handleSuccess)
+  .catch(err => {
+    console.warn('Backend unavailable, running in-browser simulation:', err);
+    const data = runPipelineSim(cfg);
+    handleSuccess(data);
+  })
+  .finally(() => {
+    if (btn) { btn.textContent = '▶ Build Case + Run Full Pipeline'; btn.disabled = false; btn.style.opacity = '1'; }
+  });
+}
+
+// ── Build + run ───────────────────────────────────────────────────────────────
+function buildAndRun() {
+  buildCase();  // builds and runs in one call
+}
+
+// ── Resume from HITL ───────────────────────────────────────────────────────────
+function resumeHitL() {
+  if (!hitlCaseId) { showToast('No case in HITL queue'); return; }
+  const action = document.querySelector('input[name="hil-action"]:checked');
+  if (!action) { showToast('Select a supervisor action first'); return; }
+
+  const isStatic = window.location.protocol === 'file:' || window.location.hostname.endsWith('github.io');
+  const handleResume = (data) => {
+    currentCase = data.state;
+    hitlCaseId = data.hitlCaseId || null;
+    showStatus(data.state.closed ? 'closed' : 'case-run', data.message || 'Resolved');
+    showNodeVis(data.nodeVis);
+    renderState(data.state);
+    renderAudit(data.auditLog);
+    if (data.state.closed) {
+      document.getElementById('btn-run-resume').style.display = 'none';
+      addHistory(data.state);
+    }
+    document.getElementById('panel-run').classList.add('active');
+    switchTab('run');
+    refreshHitL();
+  };
+
+  if (isStatic) {
+    const data = resumeHitLSim(hitlCaseId, action.value, "Supervisor action via UI");
+    handleResume(data);
+    return;
+  }
+
+  fetch('/api/resume', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ caseId: hitlCaseId, resolution: action.value, action: action.value }),
+  })
+  .then(r => r.json())
+  .then(handleResume)
+  .catch(err => {
+    const data = resumeHitLSim(hitlCaseId, action.value, "Supervisor action via UI");
+    handleResume(data);
+  });
+}
+
+// ── Clear run ─────────────────────────────────────────────────────────────────
+function clearRun() {
+  currentCase = null;
+  hitlCaseId = null;
+  document.getElementById('run-status').innerHTML = '';
+  document.getElementById('run-node-vis').innerHTML = '';
+  document.getElementById('run-state').innerHTML = '';
+  document.getElementById('run-audit').innerHTML = '';
+  document.getElementById('run-hitl').innerHTML = '';
+  document.getElementById('run-result').innerHTML = '';
+  document.getElementById('btn-run-resume').style.display = 'none';
+  showStatus('idle', 'Idle');
+}
+
+// ── Rendering ─────────────────────────────────────────────────────────────────
+function showStatus(type, msg) {
+  const chip = document.getElementById('status-chip');
+  const bar = document.getElementById('run-status');
+  const dotClass = {
+    'idle': 'dot-pending',
+    'case-built': 'dot-pending',
+    'running': 'dot-running',
+    'hitl': 'dot-hitl',
+    'closed': 'dot-closed',
+    'case-run': 'dot-closed',
+  }[type] || 'dot-pending';
+
+  chip.innerHTML = `<span class="status-dot ${dotClass}"></span> ${msg}`;
+  bar.innerHTML = `
+    <div class="status-bar">
+      <span class="status-dot ${dotClass}"></span>
+      <strong>${msg}</strong>
+    </div>`;
+
+  if (type === 'running') {
+    chip.style.background = '#fef9e7';
+  } else if (type === 'hitl') {
+    chip.style.background = '#f5eef8';
+  } else if (type === 'closed') {
+    chip.style.background = '#eafaf1';
+  } else {
+    chip.style.background = '';
+  }
+}
+
+function showNodeVis(nodeVis) {
+  const el = document.getElementById('run-node-vis');
+  if (!nodeVis || nodeVis.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = nodeVis.map(n => {
+    let cls = 'node-badge';
+    if (n.status === 'run') cls += ' run';
+    if (n.status === 'hitl') cls += ' hitl';
+    if (n.status === 'close') cls += ' close';
+    if (n.status === 'skip') cls += '';
+    return `<span class="${cls}">${n.name}</span>`;
+  }).join('');
+}
+
+function renderState(state) {
+  const el = document.getElementById('run-state');
+  if (!state) { el.innerHTML = '<div style="color:var(--muted); font-size:12.5px;">No case state.</div>'; return; }
+
+  const itemsHtml = (state.items || []).map((item, i) => {
+    const imgs = item.image_urls || item.imageUrls || [];
+    return `
+    <tr>
+      <td class="label">Item [${i+1}]</td>
+      <td><code>${item.sku}</code> / <code>${item.size}</code> — €${item.purchase_price_eur}<br>
+         <em>${item.condition_description}</em><br>
+         ${imgs.length > 0 ? `📷 ${imgs.length} images` : '📷 no images'}
+         ${item.is_worn ? '<br>⚠ <span style="color:var(--accent);">Worn</span>' : '<br>✓ Unworn'}
+         ${!item.packaging_intact ? '<br>⚠ <span style="color:var(--warm);">Packaging not intact</span>' : '<br>✓ Packaging intact'}
+      </td>
+    </tr>`;
+  }).join('');
+
+  const receiptHtml = state.receipt_verification
+    ? `<tr><td class="label">Receipt</td><td><code>${state.receipt_id}</code> — ${state.receipt_verification.verification_method}<br>
+        Store: ${state.receipt_verification.store_name || '—'}<br>
+        Days since purchase: ${state.receipt_verification.days_since_purchase}<br>
+        Amount: €${state.receipt_verification.transaction_amount_eur}<br>
+        Payment: ${state.receipt_verification.payment_method || '—'}</td></tr>`
+    : `<tr><td class="label">Receipt</td><td><code>${state.receipt_id || '—'}</code> — ${state.proof_verified ? 'verified' : 'not verified'}</td></tr>`;
+
+  const condStatus = state.condition_verdict?.condition_status?.value || state.condition_verdict?.condition_status || '—';
+  const conditionHtml = state.condition_verdict
+    ? `<tr><td class="label">Condition (CV)</td><td>
+        Status: <strong>${condStatus}</strong><br>
+        Is worn: ${state.condition_verdict.is_worn ? '⚠ Yes' : '✓ No'}<br>
+        Packaging intact: ${state.condition_verdict.packaging_intact ? '✓ Yes' : '⚠ No'}<br>
+        Defect suspected: ${state.condition_verdict.defect_suspected ? '⚠ Yes' : '✓ No'}<br>
+        Confidence: ${typeof state.condition_verdict.defect_confidence === 'number' ? state.condition_verdict.defect_confidence.toFixed(2) : (state.condition_verdict.defect_confidence || '—')}<br>
+        Fault type: ${state.condition_verdict.fault_type || '—'}<br>
+        Mfg fault: ${state.condition_verdict.is_manufacturing_fault ? '⚠ Yes' : '✓ No'}<br>
+        Photo quality: ${state.condition_verdict.photo_quality_passed ? '✓ Pass' : '⚠ Fail — missing: ' + (state.condition_verdict.missing_angles?.join(', ') || 'none')}</td></tr>`
+    : `<tr><td class="label">Condition</td><td><em>Not yet assessed</em></td></tr>`;
+
+  const policyHtml = state.policy_result
+    ? `<tr><td class="label">Policy</td><td>
+        Within 30 days: ${state.policy_result.within_30_day_window ? '✓ Yes' : '⚠ No'}<br>
+        Is unworn: ${state.policy_result.is_unworn ? '✓ Yes' : '⚠ No'}<br>
+        Refund amount: €${state.policy_result.refund_amount_eur}<br>
+        Under €150 cap: ${state.policy_result.under_refund_cap ? '✓ Yes' : '⚠ No — requires supervisor'}<br>
+        Escalation: ${state.policy_result.escalation_reason || 'none'}</td></tr>`
+    : `<tr><td class="label">Policy</td><td><em>Not yet evaluated</em></td></tr>`;
+
+  const holdExpiry = state.hold_reservation?.expires_at ? (typeof state.hold_reservation.expires_at === 'string' ? state.hold_reservation.expires_at : (state.hold_reservation.expires_at.strftime ? state.hold_reservation.expires_at.strftime('%H:%M %d %b') : state.hold_reservation.expires_at.toString())) : '—';
+  const stockHtml = state.stock_matrix
+    ? `<tr><td class="label">Stock Matrix</td><td>
+        Sku: ${state.stock_matrix.sku} / ${state.stock_matrix.size}<br>
+        Total available: ${state.stock_matrix.total_available}<br>
+        ${state.stock_matrix.has_local_stock ? '✓ <span style="color:var(--accent3)">Local stock at origin</span>' : '✗ No stock at origin'}
+        ${state.stock_matrix.has_network_stock ? '✓ <span style="color:var(--accent2)">Network stock available</span>' : ''}
+        ${state.hold_reservation ? `<br><span style="color:var(--hitl)">🔒 Hold: ${state.hold_reservation.hold_id} at ${state.hold_reservation.store_name} — expires ${holdExpiry}</span>` : ''}
+        ${state.transfer_manifest ? `<br><span style="color:var(--accent3)">📦 Manifest: ${state.transfer_manifest.manifest_id} → ${state.transfer_manifest.dest_store_name}</span>` : ''}
+        <br><div style="margin-top:4px;">
+        ${(state.stock_matrix.items || []).map(i => `<div style="font-size:11px; color:var(--muted);">${i.store_name}: ${i.quantity_available} ${i.is_verified ? '(verified)' : '(system-listed)'}</div>`).join('')}
+        </div></td></tr>`
+    : `<tr><td class="label">Stock</td><td><em>Not queried</em></td></tr>`;
+
+  const rmaStatus = state.supplier_claim?.status?.value || state.supplier_claim?.status || '—';
+  const defectHtml = state.supplier_claim
+    ? `<tr><td class="label">Supplier RMA</td><td>
+        Supplier: ${state.supplier_claim.supplier_name}<br>
+        Claim ID: ${state.supplier_claim.claim_id || 'pending manual submission'}<br>
+        Status: <strong style="color:${rmaStatus === 'SUBMITTED' ? 'var(--accent3)' : 'var(--warm)'}">${rmaStatus}</strong><br>
+        Evidence: ${state.rma_evidence_package_ref || '—'}</td></tr>`
+    : `<tr><td class="label">RMA</td><td><em>No RMA initiated</em></td></tr>`;
+
+  const escTime = state.escalation_timestamp ? (typeof state.escalation_timestamp === 'string' ? state.escalation_timestamp : (state.escalation_timestamp.strftime ? state.escalation_timestamp.strftime('%H:%M:%S') : state.escalation_timestamp.toString())) : '—';
+  const hitlHtml = state.escalated_to_supervisor
+    ? `<tr><td class="label">HITL</td><td>
+        ⚠️ <strong>Escalated to supervisor</strong><br>
+        Reason: ${state.escalation_reason || state.escalation_reason_detail || '—'}<br>
+        Escalated at: ${escTime}<br>
+        Supervisor notes: ${state.supervisor_notes || '—'}</td></tr>`
+    : `<tr><td class="label">HITL</td><td><em>Not escalated</em></td></tr>`;
+
+  const notifStatus = state.customer_notification_status?.value || state.customer_notification_status || '—';
+  const notifTime = state.notified_at ? (typeof state.notified_at === 'string' ? state.notified_at : (state.notified_at.strftime ? state.notified_at.strftime('%H:%M:%S') : state.notified_at.toString())) : '—';
+  const notifyHtml = `<tr><td class="label">Notification</td><td>
+    Status: <strong>${notifStatus}</strong><br>
+    Channels: ${(state.notification_channels || []).join(', ') || '—'}<br>
+    Notified at: ${notifTime}</td></tr>`;
+
+  const closedTime = state.closed_at ? (typeof state.closed_at === 'string' ? state.closed_at : (state.closed_at.strftime ? state.closed_at.strftime('%H:%M:%S') : state.closed_at.toString())) : '';
+  const deadLetter = state.dead_letter_reason?.value || state.dead_letter_reason || 'NONE';
+  const finalHtml = `
+    <tr><td class="label">Lifecycle</td><td>
+      Closed: ${state.closed ? '✓ <span style="color:var(--accent3)">Yes</span>' : '✗ No'}
+      ${closedTime ? '<br>Closed at: ' + closedTime : ''}
+      <br>Dead letter: ${deadLetter}</td></tr>`;
+
+  el.innerHTML = `
+    <table class="state-table">
+      <tbody>${itemsHtml}${receiptHtml}${conditionHtml}${policyHtml}${stockHtml}${defectHtml}${hitlHtml}${notifyHtml}${finalHtml}</tbody>
+    </table>`;
+}
+
+function renderAudit(auditLog) {
+  const el = document.getElementById('run-audit');
+  if (!auditLog || auditLog.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted); font-size:12.5px;">No audit entries yet.</div>';
+    return;
+  }
+  el.innerHTML = `
+    <div class="section-label">Audit Log (${auditLog.length} entries)</div>
+    <div class="audit-log">
+      ${auditLog.map(e => {
+        const conf = e.confidence != null ? ` conf=${e.confidence.toFixed(2)}` : '';
+        const flag = e.guardrail_result ? ` <span class="flag-${e.guardrail_result.value === 'ESCALATE_HITL' ? 'hitl' : e.guardrail_result.value === 'LOOP_RECAPTURE' ? 'hitl' : 'hitl'}">[${e.guardrail_result.value}]</span>` : '';
+        return `<div class="entry">
+          <span class="node">[${e.node_name}]</span>
+          <span class="decision">${e.decision}${conf}${flag}</span>
+          ${e.output_summary ? '<br>' + e.output_summary.split('\n').map(l => '  <span class="meta">' + l + '</span>').join('<br>') : ''}
+          ${e.note ? '<br><span class="meta">! ' + e.note + '</span>' : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function renderHitL(state) {
+  const el = document.getElementById('run-hitl');
+  if (!state || !state.escalated_to_supervisor) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = `
+    <div class="hitl-panel">
+      <div class="hitl-title">👁 HITL — Supervisor Action Required</div>
+      <p style="font-size:12.5px; color:var(--ink); margin-bottom:8px;">
+        <strong>Case ${state.case_id}</strong> — ${state.resolution_type?.value || 'PENDING_REVIEW'}
+      </p>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">
+        ${state.escalation_reason || state.escalation_reason_detail || 'Supervisor review required'}
+      </p>
+      <div class="hitl-actions" id="hil-actions">
+        ${renderHitLButtons(state)}
+      </div>
+    </div>`;
+}
+
+function renderHitLButtons(state) {
+  const resolution = state.resolution_type?.value || '';
+  const isDefect = resolution === 'DEFECT_REMEDY';
+  const isWorn = state.condition_verdict?.is_worn;
+  const isPackagingBad = !state.condition_verdict?.packaging_intact;
+
+  let buttons = '';
+  if (resolution === 'REFUND' || resolution === 'EXCHANGE' || resolution === '') {
+    buttons += `<label class="chip active" style="cursor:pointer; padding:6px 12px;">
+      <input type="radio" name="hil-action" value="APPROVE_REFUND" checked>
+      ✅ Approve refund / exchange
+    </label>`;
+  }
+  if (isWorn || isPackagingBad || resolution === 'PENDING_REVIEW') {
+    buttons += `<label class="chip" style="cursor:pointer; padding:6px 12px;">
+      <input type="radio" name="hil-action" value="REJECT_RETURN">
+      ❌ Reject return (worn / policy)
+    </label>`;
+  }
+  if (isDefect || state.condition_verdict?.defect_suspected) {
+    buttons += `<label class="chip" style="cursor:pointer; padding:6px 12px;">
+      <input type="radio" name="hil-action" value="FLAG_DEFECT_MANUAL">
+      🔎 Confirm as defect — continue RMA
+    </label>`;
+  }
+  buttons += `<label class="chip" style="cursor:pointer; padding:6px 12px;">
+    <input type="radio" name="hil-action" value="ESCALATE_PURCHASING">
+    📦 Escalate to Robin (purchasing)
+  </label>`;
+  return buttons;
+}
+
+function addHistory(state) {
+  history.push({
+    caseId: state.case_id,
+    resolution: state.resolution_type?.value || 'UNKNOWN',
+    closed: state.closed,
+    summary: `${state.items[0]?.sku || '?'} / ${state.items[0]?.size || '?'} — €${state.items[0]?.purchase_price_eur || '0'} — ${state.resolution_type?.value || '—'}`,
+  });
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (history.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted); font-size:12.5px; padding:12px; background:#f7f6f2; border:1px solid var(--line); border-radius:6px;">No cases run yet.</div>';
+    return;
+  }
+  el.innerHTML = history.map(h => `
+    <div style="padding:10px 12px; background:#faf9f6; border:1px solid var(--line); border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <strong>${h.caseId}</strong>
+        <div style="font-size:11.5px; color:var(--muted);">${h.summary}</div>
+      </div>
+      <div style="text-align:right;">
+        <span style="display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600;
+          background:${h.closed ? '#eafaf1' : '#fef9e7'}; color:${h.closed ? 'var(--accent3)' : 'var(--gold)'};">
+          ${h.closed ? 'CLOSED' : 'OPEN'}
+        </span>
+        <div style="font-size:11.5px; font-weight:600; color:var(--ink); margin-top:2px;">${h.resolution}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function refreshHitL() {
+  // HitL state is shown in the run panel; the HITL panel shows the queue
+  const el = document.getElementById('hitl-queue');
+  if (!hitlCaseId) {
+    el.innerHTML = '<div style="color:var(--muted); font-size:12.5px; padding:12px; background:#f7f6f2; border:1px solid var(--line); border-radius:6px;">No cases in HITL queue.</div>';
+    return;
+  }
+  if (!currentCase) {
+    el.innerHTML = '<div style="color:var(--muted); font-size:12.5px; padding:12px; background:#f7f6f2; border:1px solid var(--line); border-radius:6px;">No case loaded. Run a pipeline first.</div>';
+    return;
+  }
+  const s = currentCase;
+  el.innerHTML = `
+    <div class="hitl-panel" style="margin-bottom:10px;">
+      <div class="hitl-title">👁 HITL Queue — Case ${s.case_id}</div>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">
+        ${s.resolution_type?.value || s.resolution_type || 'PENDING_REVIEW'} — ${s.escalation_reason || s.escalation_reason_detail || 'Supervisor review'}
+      </p>
+      <div style="font-size:12px;">
+        <strong>Item:</strong> ${s.items[0]?.sku || '?'} / ${s.items[0]?.size || '?'} — €${s.items[0]?.purchase_price_eur || '0'}<br>
+        <strong>Store:</strong> ${s.origin_store_name}<br>
+        <strong>Customer:</strong> ${s.customer_id} (${s.customer_email || s.email || '—'})<br>
+        <strong>Receipt:</strong> ${s.receipt_id || 'none'} — ${s.proof_verified ? 'verified' : 'not verified'}<br>
+        ${s.condition_verdict ? `<strong>Condition:</strong> ${s.condition_verdict.condition_status?.value || s.condition_verdict.condition_status} | worn: ${s.condition_verdict.is_worn} | defect: ${s.condition_verdict.defect_suspected} | conf: ${typeof s.condition_verdict.defect_confidence === 'number' ? s.condition_verdict.defect_confidence.toFixed(2) : s.condition_verdict.defect_confidence}<br>` : ''}
+        ${s.policy_result ? `<strong>Policy:</strong> within_30d: ${s.policy_result.within_30_day_window} | unworn: ${s.policy_result.is_unworn} | under_cap: ${s.policy_result.under_refund_cap}<br>` : ''}
+      </div>
+      <div class="hitl-actions">
+        <label class="chip" style="cursor:pointer; padding:6px 12px;">
+          <input type="radio" name="hil-queue-action" value="APPROVE_REFUND" checked onchange="document.getElementById('btn-run-resume').style.display='inline-flex';">
+          ✅ Anouk: Approve refund/exchange
+        </label>
+        <label class="chip" style="cursor:pointer; padding:6px 12px;">
+          <input type="radio" name="hil-queue-action" value="REJECT_RETURN" onchange="document.getElementById('btn-run-resume').style.display='inline-flex';">
+          ❌ Anouk: Reject return
+        </label>
+        <label class="chip" style="cursor:pointer; padding:6px 12px;">
+          <input type="radio" name="hil-queue-action" value="FLAG_DEFECT_MANUAL" onchange="document.getElementById('btn-run-resume').style.display='inline-flex';">
+          🔎 Anouk: Confirm defect → continue RMA
+        </label>
+        <label class="chip" style="cursor:pointer; padding:6px 12px;">
+          <input type="radio" name="hil-queue-action" value="ESCALATE_PURCHASING" onchange="document.getElementById('btn-run-resume').style.display='inline-flex';">
+          📦 Robin: Escalate to purchasing
+        </label>
+      </div>
+      <button class="btn btn-hil" onclick="doHitLAction()">▶ Apply & Resume Pipeline</button>
+    </div>`;
+}
+
+function doHitLAction() {
+  const selected = document.querySelector('input[name="hil-queue-action"]:checked');
+  if (!selected) { showToast('Select a HITL action first'); return; }
+  if (!hitlCaseId) { showToast('No case in HITL'); return; }
+  const isStatic = window.location.protocol === 'file:' || window.location.hostname.endsWith('github.io');
+  const handleHitLAction = (data) => {
+    currentCase = data.state;
+    hitlCaseId = data.hitlCaseId || null;
+    showStatus(data.state.closed ? 'closed' : 'case-run', data.message || 'Resolved');
+    showNodeVis(data.nodeVis);
+    renderState(data.state);
+    renderAudit(data.auditLog);
+    renderHitL(data.state);
+    document.getElementById('btn-run-resume').style.display = 'none';
+    if (data.state.closed) addHistory(data.state);
+    refreshHitL();
+    document.getElementById('panel-run').classList.add('active');
+    switchTab('run');
+  };
+
+  if (isStatic) {
+    const data = resumeHitLSim(hitlCaseId, selected.value, "Supervisor action via HITL queue");
+    handleHitLAction(data);
+    return;
+  }
+
+  fetch('/api/resume', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ caseId: hitlCaseId, action: selected.value, resolution: selected.value }),
+  })
+  .then(r => r.json())
+  .then(handleHitLAction)
+  .catch(err => {
+    const data = resumeHitLSim(hitlCaseId, selected.value, "Supervisor action via HITL queue");
+    handleHitLAction(data);
+  });
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Floating Chatbot Widget ─────────────────────────────────────────────────────
+// The chatbot is a floating widget (bottom-right), always visible.
+// Collapsed mode shows a 💬 toggle button; expanded mode shows the full chat UI.
+
+function expandChatFloat() {
+  const body = document.getElementById('chat-float-body');
+  const collapsed = document.getElementById('chat-float-collapsed');
+  if (body) body.style.display = 'flex';
+  if (collapsed) collapsed.style.display = 'none';
+}
+
+function minimizeChatFloat() {
+  const body = document.getElementById('chat-float-body');
+  const collapsed = document.getElementById('chat-float-collapsed');
+  if (body) body.style.display = 'none';
+  if (collapsed) collapsed.style.display = 'flex';
+}
+
+// Auto-expand the chat widget on page load so it's always visible.
+document.addEventListener('DOMContentLoaded', function() {
+  expandChatFloat();
+});
+
+// ── Chatbot ────────────────────────────────────────────────────────────────────
+const chatMessages = [];
+
+function chatRender() {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+  // Keep the welcome message as the first child; re-render the rest
+  const existingWelcome = container.querySelector('.chat-msg.chat-bot:first-child');
+  container.innerHTML = '';
+  if (existingWelcome) container.appendChild(existingWelcome);
+  chatMessages.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + msg.type;
+    if (msg.label) {
+      const label = document.createElement('div');
+      label.className = 'chat-msg-label';
+      label.textContent = msg.label;
+      div.appendChild(label);
+    }
+    if (msg.body) {
+      const body = document.createElement('div');
+      body.className = 'chat-msg-body';
+      body.innerHTML = msg.body;
+      div.appendChild(body);
+    }
+    if (msg.raw) {
+      const pre = document.createElement('pre');
+      pre.style.cssText = 'font-size:11px; background:#1a1a2e; color:#a0c4ff; padding:6px 10px; border-radius:6px; margin-top:4px; overflow-x:auto; font-family:Monaco,Consolas,monospace;';
+      pre.textContent = msg.raw;
+      div.appendChild(pre);
+    }
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function chatAdd(type, label, body, raw) {
+  chatMessages.push({ type, label, body, raw });
+  chatRender();
+}
+
+function chatQuick(text) {
+  document.getElementById('chat-input').value = text;
+  chatSend();
+}
+
+function chatSend() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  chatAdd('chat-user', 'You', text);
+  // Show a brief "thinking" indicator
+  chatAdd('chat-system', 'Bot', '<span style="color:var(--accent2)">⏳ thinking…</span>');
+  const isStatic = window.location.protocol === 'file:' || window.location.hostname.endsWith('github.io');
+  const chatPromise = isStatic
+    ? Promise.resolve(chatSim(text))
+    : fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      }).then(r => r.json()).catch(err => chatSim(text));
+
+  chatPromise
+  .then(data => {
+    // Remove the thinking indicator from chatMessages
+    if (chatMessages.length > 0 && chatMessages[chatMessages.length - 1].body && chatMessages[chatMessages.length - 1].body.includes('thinking')) {
+      chatMessages.pop();
+    }
+    if (data.error) {
+      chatAdd('chat-bot', '⚠ Error', data.error);
+    } else {
+      // Render the response
+      if (data.tab) switchTab(data.tab);
+      if (data.stateJson) {
+        // Render unified state & audit card — fills width, cannot squish
+        const sj = data.stateJson;
+        let cardHtml = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #b2d8c3; padding-bottom:5px;">
+            <span style="font-size:12.5px; font-weight:700; color:#1e6f5c;">Case: ${sj.case_id}</span>
+            <span style="font-size:10.5px; padding:2px 7px; border-radius:10px; font-weight:700; background:${sj.closed ? '#c8e6c0' : '#fef9e7'}; color:${sj.closed ? '#1e6f5c' : '#7d6608'};">${sj.closed ? 'CLOSED' : 'OPEN'}</span>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px 10px; font-size:11.5px; margin-bottom:8px;">
+            <div><span style="color:#1e6f5c; font-weight:600;">Resolution:</span> <code>${sj.resolution_type || '—'}</code></div>
+            <div><span style="color:#1e6f5c; font-weight:600;">Notified:</span> <code>${sj.customer_notification_status || '—'}</code></div>
+            <div><span style="color:#1e6f5c; font-weight:600;">Store:</span> <code>${sj.origin_store_name || '—'}</code></div>
+            <div><span style="color:#1e6f5c; font-weight:600;">Customer:</span> <code>${sj.customer_email || '—'}</code></div>
+          </div>`;
+        if (sj.stock_matrix && sj.stock_matrix.items) {
+          cardHtml += '<div style="margin-top:6px; padding:6px 8px; background:#fff; border:1px solid #b2d8c3; border-radius:6px; font-size:11px; margin-bottom:8px;">';
+          cardHtml += '<strong style="color:#1e6f5c;">Stock Matrix:</strong><br>';
+          sj.stock_matrix.items.forEach(i => {
+            cardHtml += `<span style="color:var(--text);">${i.store_name}:</span> <code>${i.quantity_available}</code> · `;
+          });
+          cardHtml = cardHtml.slice(0, -2);
+          cardHtml += `<br><span style="color:var(--muted); font-size:10.5px;">Total: ${sj.stock_matrix.total_available} pairs · local: ${sj.stock_matrix.has_local_stock ? '✓' : '✗'} · network: ${sj.stock_matrix.has_network_stock ? '✓' : '✗'}</span>`;
+          cardHtml += '</div>';
+        }
+        if (data.auditHtml) {
+          cardHtml += '<div style="margin-top:8px; border-top:1px solid #b2d8c3; padding-top:6px;">';
+          cardHtml += '<div style="font-size:11px; font-weight:700; color:#1e6f5c; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:5px;">Audit Trail</div>';
+          cardHtml += data.auditHtml;
+          cardHtml += '</div>';
+        }
+        chatAdd('chat-case', '📋 Case ' + sj.case_id, cardHtml);
+      } else {
+        chatAdd('chat-bot', data.label || '💬 Pipeline Bot', data.body);
+      }
+    }
+  })
+  .catch(err => {
+    if (chatMessages.length > 0 && chatMessages[chatMessages.length - 1].body && chatMessages[chatMessages.length - 1].body.includes('thinking')) {
+      chatMessages.pop();
+    }
+    chatAdd('chat-bot', '⚠ Error', 'Request failed: ' + err.message);
+  });
+}
+
+// Allow Enter key to send
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); chatSend(); }
+    });
+  }
+  chatRender();
+});
+</script>
+</body>
+</html>
